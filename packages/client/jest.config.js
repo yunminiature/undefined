@@ -1,5 +1,5 @@
 import { pathsToModuleNameMapper } from 'ts-jest';
-import { compilerOptions } from './tsconfig.json';
+import tsconfig from './tsconfig.json' assert { type: 'json' }; 
 import dotenv from 'dotenv'
 dotenv.config()
 
@@ -8,7 +8,7 @@ export default {
   testEnvironment: 'jsdom',
   setupFiles: ['<rootDir>/src/setupTests.ts'],
   moduleNameMapper: {
-    ...pathsToModuleNameMapper(compilerOptions.paths, {
+    ...pathsToModuleNameMapper(tsconfig.compilerOptions.paths, {
       prefix: '<rootDir>/',
     }),
     '^.+\\.module\\.(css|scss|sass)$': 'identity-obj-proxy',
