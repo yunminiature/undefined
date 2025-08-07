@@ -6,10 +6,12 @@ export default {
   testEnvironment: 'jsdom',
   setupFiles: ['<rootDir>/src/setupTests.ts'],
   moduleNameMapper: {
+    '^@/components$': '<rootDir>/src/components/index.ts',
     '^@/components/(.*)$': '<rootDir>/src/components/$1',
     '^@/lib/(.*)$': '<rootDir>/src/lib/$1',
     '^@/hooks/(.*)$': '<rootDir>/src/hooks/$1',
     '^@/utils/(.*)$': '<rootDir>/src/lib/utils/$1',
+    '^@/pages$': '<rootDir>/src/pages/index.ts',
     '^@/pages/(.*)$': '<rootDir>/src/pages/$1',
     '^@/layouts/(.*)$': '<rootDir>/src/layouts/$1',
     '^@/routes/(.*)$': '<rootDir>/src/routes/$1',
