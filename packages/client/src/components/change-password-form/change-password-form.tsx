@@ -51,7 +51,7 @@ export const ChangePasswordForm = () => {
         <FormField
           control={form.control}
           name='oldPassword'
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem>
               <FormLabel>{TITLE.OLD_PASSWORD.LABEL}</FormLabel>
               <FormControl>
@@ -62,7 +62,7 @@ export const ChangePasswordForm = () => {
                   {...field}
                 />
               </FormControl>
-              <FormDescription>{TITLE.OLD_PASSWORD.DESCRIPTION}</FormDescription>
+              {!fieldState.error && <FormDescription>{TITLE.OLD_PASSWORD.DESCRIPTION}</FormDescription>}
               <FormMessage />
             </FormItem>
           )}
@@ -72,13 +72,13 @@ export const ChangePasswordForm = () => {
         <FormField
           control={form.control}
           name='newPassword'
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem>
               <FormLabel>{TITLE.NEW_PASSWORD.LABEL}</FormLabel>
               <FormControl>
                 <Input type='password' placeholder={TITLE.NEW_PASSWORD.PLACEHOLDER} {...field} />
               </FormControl>
-              <FormDescription>{TITLE.NEW_PASSWORD.DESCRIPTION}</FormDescription>
+              {!fieldState.error && <FormDescription>{TITLE.NEW_PASSWORD.DESCRIPTION}</FormDescription>}
               <FormMessage />
             </FormItem>
           )}
@@ -88,13 +88,13 @@ export const ChangePasswordForm = () => {
         <FormField
           control={form.control}
           name='confirmPassword'
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem>
               <FormLabel>{TITLE.CONFIRM_PASSWORD.LABEL}</FormLabel>
               <FormControl>
                 <Input type='password' placeholder={TITLE.CONFIRM_PASSWORD.PLACEHOLDER} {...field} />
               </FormControl>
-              <FormDescription>{TITLE.CONFIRM_PASSWORD.DESCRIPTION}</FormDescription>
+              {!fieldState.error && <FormDescription>{TITLE.CONFIRM_PASSWORD.DESCRIPTION}</FormDescription>}
               <FormMessage />
             </FormItem>
           )}
