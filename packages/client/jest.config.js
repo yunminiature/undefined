@@ -4,7 +4,17 @@ dotenv.config()
 export default {
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
-  testMatch: ['<rootDir>/src/**/*.test.{ts,tsx}'],
+  setupFiles: ['<rootDir>/src/setupTests.ts'],
+  moduleNameMapper: {
+    '^@/components/(.*)$': '<rootDir>/src/components/$1',
+    '^@/lib/(.*)$': '<rootDir>/src/lib/$1',
+    '^@/hooks/(.*)$': '<rootDir>/src/hooks/$1',
+    '^@/utils/(.*)$': '<rootDir>/src/lib/utils/$1',
+    '^@/pages/(.*)$': '<rootDir>/src/pages/$1',
+    '^@/layouts/(.*)$': '<rootDir>/src/layouts/$1',
+    '^@/routes/(.*)$': '<rootDir>/src/routes/$1',
+  },
+  testMatch: ['<rootDir>/src/**/*.(test|spec).{ts,tsx}'],
   globals: {
     __SERVER_PORT__: process.env.SERVER_PORT,
   },
