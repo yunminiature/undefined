@@ -16,7 +16,14 @@ export const usersService = createApi({
         body,
       }),
     }),
+    changeAvatar: builder.mutation<{ avatar: string }, FormData>({
+      query: (formData) => ({
+        url: '/user/profile/avatar', // swagger: PUT /user/profile/avatar
+        method: 'PUT',
+        body: formData,
+      }),
+    }),
   }),
 });
 
-export const { useChangePasswordMutation } = usersService;
+export const { useChangePasswordMutation, useChangeAvatarMutation } = usersService;

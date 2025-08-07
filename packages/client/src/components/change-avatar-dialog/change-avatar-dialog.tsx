@@ -5,15 +5,20 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import s from './change-avatar-dialog.module.css';
 import { Button } from '../ui/button';
 import { ChangeAvatarForm } from '../change-avatar-form';
+import { useState } from 'react';
 
 export const ChangeAvatarDialog = () => {
+  const [open, setOpen] = useState(false);
+
+  const onClose = () => setOpen(false);
+
   return (
     <div className={s.group}>
       <Avatar className='size-[64px]'>
         <AvatarImage src='https://github.com/shadcn.png' />
         <AvatarFallback>AI</AvatarFallback>
       </Avatar>
-      <Dialog>
+      <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button variant='outline'>
             <Pencil />
@@ -28,7 +33,7 @@ export const ChangeAvatarDialog = () => {
             </DialogDescription>
           </DialogHeader>
 
-          <ChangeAvatarForm />
+          <ChangeAvatarForm onClose={onClose} />
         </DialogContent>
       </Dialog>
     </div>
