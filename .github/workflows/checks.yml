@@ -21,7 +21,7 @@ jobs:
           corepack prepare yarn@4.9.2 --activate
           yarn --version
       - name: Install main deps
-        run: yarn
+        run: yarn install --immutable --no-check-resolutions
       - name: Initialize
         run: yarn lerna bootstrap
       - name: Lint
