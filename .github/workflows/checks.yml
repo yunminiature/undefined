@@ -21,7 +21,7 @@ jobs:
           corepack prepare yarn@4.9.2 --activate
           yarn --version
       - name: Install main deps
-        run: yarn install --immutable --no-check-resolutions
+        run: YARN_ENABLE_IMMUTABLE_INSTALLS=0 yarn install --no-check-resolutions
       - name: Lint
         run: yarn lint
       - name: Test
