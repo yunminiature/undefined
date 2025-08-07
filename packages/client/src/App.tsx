@@ -10,12 +10,8 @@ import Forum from './pages/Forum';
 import ForumTopic from './pages/ForumTopic';
 import NotFound from './pages/NotFound';
 
-import './App.css';
-import { SettingsPage } from './pages';
-import { Provider } from 'react-redux';
-import { store } from './store';
-import { Toaster } from './components/ui/sonner';
-import { AuthLayout } from './layouts/AuthLayout';
+import './App.css'
+import { GameTest } from './components/game-test/game-test'
 
 function App() {
   return (
