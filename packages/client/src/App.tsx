@@ -16,6 +16,7 @@ import { SettingsPage } from './pages';
 import { Provider } from 'react-redux';
 import { store } from './store';
 import { Toaster } from './components/ui/sonner';
+import { AuthLayout } from './layouts/AuthLayout';
 
 function App() {
   useEffect(() => {
@@ -41,9 +42,13 @@ function App() {
             <Route path='leaderboard' element={<Leaderboard />} />
             <Route path='forum' element={<Forum />} />
             <Route path='forum/:topicId' element={<ForumTopic />} />
-            <Route path='*' element={<NotFound />} />
           </Route>
-          <Route path='profile' element={<SettingsPage />} />
+
+          <Route element={<AuthLayout />}>
+            <Route path='profile' element={<SettingsPage />} />
+          </Route>
+
+          <Route path='*' element={<NotFound />} />
         </Routes>
       </BrowserRouter>
       <Toaster />

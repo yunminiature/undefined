@@ -3,8 +3,15 @@ import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
 
 import s from './Settings.module.css';
+import { useNavigate } from 'react-router-dom';
 
 export const SettingsPage = () => {
+  const navigate = useNavigate();
+
+  const onBack = () => {
+    navigate(-1);
+  };
+
   return (
     <div className={s.page}>
       <header className={s.header}>
@@ -13,7 +20,7 @@ export const SettingsPage = () => {
 
       <main className={s.main}>
         <nav className={s.nav}>
-          <Button variant='outline' className='w-full'>
+          <Button variant='outline' className='w-full' onClick={onBack}>
             <ChevronLeft />
             Go back
           </Button>
