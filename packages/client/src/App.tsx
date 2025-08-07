@@ -1,6 +1,9 @@
 import { useEffect } from 'react';
 import './App.css';
 import { SettingsPage } from './pages';
+import { Provider } from 'react-redux';
+import { store } from './store';
+import { Toaster } from './components/ui/sonner';
 
 function App() {
   useEffect(() => {
@@ -14,9 +17,12 @@ function App() {
     fetchServerData();
   }, []);
   return (
-    <div className='flex flex-col justify-center items-center w-full'>
-      <SettingsPage />
-    </div>
+    <Provider store={store}>
+      <div className='app'>
+        <SettingsPage />
+      </div>
+      <Toaster />
+    </Provider>
   );
 }
 

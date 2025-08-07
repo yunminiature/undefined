@@ -5,31 +5,48 @@ import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 
 import s from './change-password-form.module.css';
+import z from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useChangePasswordMutation } from '@/api/users';
+import { toast } from 'sonner';
+import { schema } from './change-password-form.validation';
+import { getErrorMessage } from './change-password-form.utils';
+import { TITLE } from './change-password-form.constants';
 
-const TITLE = {
-  OLD_PASSWORD: {
-    LABEL: 'Verify current password',
-    PLACEHOLDER: 'Current password',
-    DESCRIPTION: 'Use your current password.',
-  },
-  NEW_PASSWORD: {
-    LABEL: 'New password',
-    PLACEHOLDER: 'New password',
-    DESCRIPTION: '8–40 characters, must include at least one uppercase letter and one digit.',
-  },
-  CONFIRM_PASSWORD: {
-    LABEL: 'Confirm password',
-    PLACEHOLDER: 'Confirm password',
-    DESCRIPTION: 'Re-enter your new password.',
-  },
-} as const;
+type FormValues = z.infer<typeof schema>;
 
 export const ChangePasswordForm = () => {
-  const form = useForm();
+  const [changePassword, { isLoading }] = useChangePasswordMutation();
+
+  const form = useForm<FormValues>({
+    resolver: zodResolver(schema),
+    mode: 'onChange',
+    defaultValues: {
+      oldPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    },
+  });
+
+  const onSubmit = async (values: FormValues) => {
+    try {
+      await changePassword({
+        oldPassword: values.oldPassword,
+        newPassword: values.newPassword,
+      }).unwrap();
+
+      toast.success('Password updated');
+      form.reset();
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error));
+    }
+  };
+
+  const disabled = isLoading || !form.formState.isValid;
 
   return (
     <Form {...form}>
-      <form className={s.form}>
+      <form className={s.form} onSubmit={form.handleSubmit(onSubmit)}>
         {/* OLD_PASSWORD */}
         <FormField
           control={form.control}
@@ -41,7 +58,7 @@ export const ChangePasswordForm = () => {
                 <Input
                   type='password'
                   placeholder={TITLE.OLD_PASSWORD.PLACEHOLDER}
-                  autoComplete='password'
+                  autoComplete='current-password'
                   {...field}
                 />
               </FormControl>
@@ -70,7 +87,7 @@ export const ChangePasswordForm = () => {
         {/* CONFIRM_PASSWORD */}
         <FormField
           control={form.control}
-          name='newPassword'
+          name='confirmPassword'
           render={({ field }) => (
             <FormItem>
               <FormLabel>{TITLE.CONFIRM_PASSWORD.LABEL}</FormLabel>
@@ -83,7 +100,9 @@ export const ChangePasswordForm = () => {
           )}
         />
 
-        <Button className='w-max'>Save</Button>
+        <Button type='submit' disabled={disabled} className='w-max'>
+          {isLoading ? 'Saving…' : 'Save'}
+        </Button>
       </form>
     </Form>
   );
