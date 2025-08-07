@@ -2,7 +2,7 @@ import { ChangeAvatarDialog, ChangePasswordForm, Header, SectionHeading, UserInf
 import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
 
-import s from './settings.module.css';
+import s from './Settings.module.css';
 
 export const SettingsPage = () => {
   return (

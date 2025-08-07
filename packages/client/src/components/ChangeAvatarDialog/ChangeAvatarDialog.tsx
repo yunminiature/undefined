@@ -2,10 +2,11 @@ import { Pencil } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
 
-import s from './change-avatar-dialog.module.css';
 import { Button } from '../ui/button';
-import { ChangeAvatarForm } from '../change-avatar-form';
+import { ChangeAvatarForm } from '../ChangeAvatarForm';
 import { useState } from 'react';
+
+import s from './ChangeAvatarDialog.module.css';
 
 export const ChangeAvatarDialog = () => {
   const [open, setOpen] = useState(false);

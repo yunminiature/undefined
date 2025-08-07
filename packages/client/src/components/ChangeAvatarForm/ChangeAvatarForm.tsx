@@ -4,15 +4,15 @@ import { Form, FormControl, FormDescription, FormItem, FormLabel, FormMessage } 
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 
-import s from './change-avatar-form.module.css';
+import s from './ChangeAvatarForm.module.css';
 import z from 'zod';
 
 import { useChangeAvatarMutation } from '@/api/users';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
-import { avatarSchema } from './change-avatar-form.validation';
-import { ALLOWED_TYPES, TITLE } from './change-avatar-form.constants';
-import { getAvatarErrorMessage } from './change-avatar-form.utils';
+import { avatarSchema } from './ChangeAvatarForm.validation';
+import { ALLOWED_TYPES, TITLE } from './ChangeAvatarForm.constants';
+import { getAvatarErrorMessage } from './ChangeAvatarForm.utils';
 
 type AvatarFormValues = z.infer<typeof avatarSchema>;
 

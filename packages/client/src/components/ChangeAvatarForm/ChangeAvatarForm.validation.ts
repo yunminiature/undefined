@@ -1,5 +1,5 @@
 import z from 'zod';
-import { ALLOWED_TYPES, MAX_FILE_SIZE } from './change-avatar-form.constants';
+import { ALLOWED_TYPES, MAX_FILE_SIZE } from './ChangeAvatarForm.constants';
 
 export const avatarSchema = z.object({
   avatar: z

@@ -4,14 +4,14 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 
-import s from './change-password-form.module.css';
+import s from './ChangePasswordForm.module.css';
 import z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useChangePasswordMutation } from '@/api/users';
 import { toast } from 'sonner';
-import { schema } from './change-password-form.validation';
-import { getErrorMessage } from './change-password-form.utils';
-import { TITLE } from './change-password-form.constants';
+import { schema } from './ChangePasswordForm.validation';
+import { getErrorMessage } from './ChangePasswordForm.utils';
+import { TITLE } from './ChangePasswordForm.constants';
 
 type FormValues = z.infer<typeof schema>;
 

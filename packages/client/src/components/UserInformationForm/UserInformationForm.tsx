@@ -4,7 +4,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 
-import s from './user-information-form.module.css';
+import s from './UserInformationForm.module.css';
 
 const TITLE = {
   LOGIN: {

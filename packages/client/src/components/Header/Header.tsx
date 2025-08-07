@@ -1,4 +1,4 @@
-import s from './header.module.css';
+import s from './Header.module.css';
 
 type HeaderProps = {
   title?: string | number;

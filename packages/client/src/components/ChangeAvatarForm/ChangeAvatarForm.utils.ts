@@ -1,4 +1,4 @@
-import { isBaseQueryError } from '../utils';
+import { isBaseQueryError } from '../../utils';
 
 export const getAvatarErrorMessage = (err: unknown): string => {
   if (isBaseQueryError(err)) {
