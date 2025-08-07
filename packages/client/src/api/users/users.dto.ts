@@ -1,4 +1,4 @@
-import { User } from '@/components/types';
+import { User } from '@/types';
 
 export type ChangePasswordRequest = {
   oldPassword: string;
