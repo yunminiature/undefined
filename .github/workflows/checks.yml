@@ -23,7 +23,7 @@ jobs:
       - name: Install main deps
         run: yarn install --immutable --no-check-resolutions
       - name: Initialize
-        run: yarn lerna bootstrap
+        run: yarn lerna bootstrap --no-ci
       - name: Lint
         run: yarn lint
       - name: Test
