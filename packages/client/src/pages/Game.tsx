@@ -1,3 +1,5 @@
+import { GameContainer } from '@/components/GameContainer/GameContainer'
+
 export default function Game() {
-  return <div>Game page</div>;
+  return <GameContainer />
 }

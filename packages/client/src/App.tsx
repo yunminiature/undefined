@@ -11,7 +11,6 @@ import ForumTopic from './pages/ForumTopic';
 import NotFound from './pages/NotFound';
 
 import './App.css'
-import { GameTest } from './components/game-test/game-test'
 
 function App() {
   return (

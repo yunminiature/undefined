@@ -126,7 +126,7 @@ export const GameBoardCanvas = ({ board }: Props) => {
   return (
     <canvas
       ref={canvasRef}
-      className="w-full h-full aspect-square border border-border rounded-md bg-background max-w-96 max-h-96 lg:max-w-[36rem] lg:max-h-[36rem]"
+      className="w-full h-full aspect-square border border-border rounded-md bg-background"
     />
   )
 }
