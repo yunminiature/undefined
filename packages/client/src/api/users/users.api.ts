@@ -2,8 +2,8 @@ import { BASE_API_URL } from '@/constants';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { ChangePasswordRequest, ChangePasswordResponse } from './users.dto';
 
-export const usersService = createApi({
-  reducerPath: 'usersService',
+export const usersApi = createApi({
+  reducerPath: 'usersApi',
   baseQuery: fetchBaseQuery({
     baseUrl: BASE_API_URL,
     credentials: 'include',
@@ -26,4 +26,4 @@ export const usersService = createApi({
   }),
 });
 
-export const { useChangePasswordMutation, useChangeAvatarMutation } = usersService;
+export const { useChangePasswordMutation, useChangeAvatarMutation } = usersApi;
