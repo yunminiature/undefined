@@ -1,6 +1,13 @@
 .form {
   display: flex;
   flex-direction: column;
-  gap: var(--s-4) var(--s-6);
+  gap: var(--s-4);
+  width: 100%;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
   width: 100%;
 }

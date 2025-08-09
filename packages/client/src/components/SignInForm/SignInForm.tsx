@@ -1,10 +1,10 @@
 import { useForm } from 'react-hook-form';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
+import { Input } from '../ui/input';
+import { Button } from '../ui/button';
+import { TITLE } from './SignInForm.constants';
 
 import s from './SignInForm.module.css';
-import { Input } from '../ui/input';
-import { TITLE } from './SignInForm.constants';
-import { Button } from '../ui/button';
 
 export const SignInForm = () => {
   const form = useForm();
@@ -22,35 +22,39 @@ export const SignInForm = () => {
   return (
     <Form {...form}>
       <form className={s.form} onSubmit={form.handleSubmit(onSubmit)}>
-        {/* LOGIN */}
-        <FormField
-          control={form.control}
-          name='login'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{TITLE.LOGIN.LABEL}</FormLabel>
-              <FormControl>
-                <Input placeholder={TITLE.LOGIN.PLACEHOLDER} autoComplete='username' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className={s.fields}>
+          {/* LOGIN */}
+          <FormField
+            control={form.control}
+            name='login'
+            render={({ field, fieldState }) => (
+              <FormItem>
+                <FormLabel>{TITLE.LOGIN.LABEL}</FormLabel>
+                <FormControl>
+                  <Input placeholder={TITLE.LOGIN.PLACEHOLDER} autoComplete='username' {...field} />
+                </FormControl>
+                {!fieldState.error && <FormDescription>{TITLE.LOGIN.DESCRIPTION}</FormDescription>}
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        {/* PASSWORD */}
-        <FormField
-          control={form.control}
-          name='password'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{TITLE.PASSWORD.LABEL}</FormLabel>
-              <FormControl>
-                <Input type='password' placeholder={TITLE.PASSWORD.PLACEHOLDER} autoComplete='password' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          {/* PASSWORD */}
+          <FormField
+            control={form.control}
+            name='password'
+            render={({ field, fieldState }) => (
+              <FormItem>
+                <FormLabel>{TITLE.PASSWORD.LABEL}</FormLabel>
+                <FormControl>
+                  <Input type='password' placeholder={TITLE.PASSWORD.PLACEHOLDER} autoComplete='password' {...field} />
+                </FormControl>
+                {!fieldState.error && <FormDescription>{TITLE.PASSWORD.DESCRIPTION}</FormDescription>}
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <Button type='submit' disabled={disabled} size='lg' className='w-full'>
           Sign in

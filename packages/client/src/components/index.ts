@@ -5,3 +5,4 @@ export * from './ChangePasswordForm';
 export * from './ChangeAvatarDialog';
 export * from './ChangeAvatarForm';
 export * from './SignInForm';
+export * from './SignUpForm';
