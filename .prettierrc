@@ -1,7 +1,21 @@
 {
+  "bracketSpacing": true,
+  "quoteProps": "as-needed",
+  "semi": true,
   "singleQuote": true,
-  "semi": false,
-  "arrowParens": "avoid",
-  "bracketSameLine": true,
-  "width": 50
+  "tabWidth": 2,
+  "useTabs": false,
+  "printWidth": 120,
+  "jsxSingleQuote": true,
+  "trailingComma": "es5",
+  "arrowParens": "always",
+  "overrides": [
+    {
+      "files": ["**/*.css", "**/*.scss", "**/*.html"],
+      "options": {
+        "singleQuote": false,
+        "tabWidth": 2
+      }
+    }
+  ]
 }

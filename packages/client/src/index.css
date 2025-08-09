@@ -1,3 +1,5 @@
+@import "./assets/styles/fonts.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -64,6 +66,30 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    max-width: 100dvw;
+    height: 100dvh;
+    max-height: 100dvh;
+    font-family: var(--font-sans);
+
+    [id="app"] {
+      width: inherit;
+      height: inherit;
+    }
+  }
+}
+
+@layer base {
+  :root {
+    /* spacing */
+    --s-1: 4px;
+    --s-2: 8px;
+    --s-3: 12px;
+    --s-4: 16px;
+    --s-5: 20px;
+    --s-6: 24px;
+    --s-7: 28px;
+    --s-8: 32px;
+    --s-9: 36px;
+    --s-10: 40px;
   }
 }
