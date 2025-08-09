@@ -11,6 +11,8 @@ import Leaderboard from './pages/Leaderboard'
 import Forum from './pages/Forum'
 import ForumTopic from './pages/ForumTopic'
 import NotFound from './pages/NotFound'
+import Error400 from './pages/Error400'
+import Error500 from './pages/Error500'
 
 import './App.css'
 
@@ -38,6 +40,8 @@ function App() {
           <Route path="leaderboard" element={<Leaderboard />} />
           <Route path="forum" element={<Forum />} />
           <Route path="forum/:topicId" element={<ForumTopic />} />
+          <Route path="error/400" element={<Error400 />} />
+          <Route path="error/500" element={<Error500 />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

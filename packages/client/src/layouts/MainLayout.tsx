@@ -15,7 +15,8 @@ const links = [
   { to: '/leaderboard', label: 'Leaderboard' },
   { to: '/forum', label: 'Forum' },
   { to: '/forum/topicId', label: 'ForumTopic' },
-  { to: '/some-missing-page', label: '404' },
+  { to: '/error/400', label: '400' },
+  { to: '/error/500', label: '500' },
 ]
 
 export default function MainLayout() {
