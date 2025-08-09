@@ -32,6 +32,8 @@ function App() {
             <Route path='leaderboard' element={<Leaderboard />} />
             <Route path='forum' element={<Forum />} />
             <Route path='forum/:topicId' element={<ForumTopic />} />
+            <Route path='error/400' element={<Error400 />} />
+            <Route path='error/500' element={<Error500 />} />
           </Route>
 
           <Route element={<AuthLayout />}>
@@ -39,8 +41,6 @@ function App() {
           </Route>
 
           <Route path='*' element={<NotFound />} />
-          <Route path='error/400' element={<Error400 />} />
-          <Route path='error/500' element={<Error500 />} />
         </Routes>
       </BrowserRouter>
       <Toaster />
