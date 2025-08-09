@@ -7,8 +7,8 @@ import {
 import { NavLink, Outlet } from 'react-router-dom';
 
 const links = [
-  { to: '/register', label: 'Register' },
-  { to: '/login', label: 'Login' },
+  { to: '/sign-up', label: 'Sign Up' },
+  { to: '/sign-in', label: 'Sign In' },
   { to: '/profile', label: 'Profile' },
   { to: '/', label: 'Home' },
   { to: '/game', label: 'Game' },

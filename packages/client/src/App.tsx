@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import MainLayout from './layouts/MainLayout';
 import Home from './pages/Home';
-import Login from './pages/Login';
 import Register from './pages/Register';
 import Game from './pages/Game';
 import Leaderboard from './pages/Leaderboard';
@@ -16,6 +15,7 @@ import { Provider } from 'react-redux';
 import { store } from './store';
 import { Toaster } from './components/ui/sonner';
 import { AuthLayout } from './layouts/AuthLayout';
+import { SignInPage } from './pages/SignIn';
 
 function App() {
   return (
@@ -24,8 +24,6 @@ function App() {
         <Routes>
           <Route path='/' element={<MainLayout />}>
             <Route index element={<Home />} />
-            <Route path='login' element={<Login />} />
-            <Route path='register' element={<Register />} />
             <Route path='game' element={<Game />} />
             <Route path='leaderboard' element={<Leaderboard />} />
             <Route path='forum' element={<Forum />} />
@@ -33,6 +31,8 @@ function App() {
           </Route>
 
           <Route element={<AuthLayout />}>
+            <Route path='sign-up' element={<Register />} />
+            <Route path='sign-in' element={<SignInPage />} />
             <Route path='profile' element={<SettingsPage />} />
           </Route>
 
