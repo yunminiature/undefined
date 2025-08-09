@@ -1,4 +1,4 @@
-import * as React from 'react'
+import * as React from 'react';
 import {
   NavigationMenu as NavigationMenuPrimitive,
   NavigationMenuList,
@@ -6,20 +6,16 @@ import {
   NavigationMenuLink,
   NavigationMenuContent,
   NavigationMenuTrigger,
-} from '@radix-ui/react-navigation-menu'
-import { cn } from '@/lib/utils'
+} from '@radix-ui/react-navigation-menu';
+import { cn } from '@/lib/utils';
 
 const NavigationMenu = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive>,
   React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive>
 >(({ className, ...props }, ref) => (
-  <NavigationMenuPrimitive
-    ref={ref}
-    className={cn('relative z-10', className)}
-    {...props}
-  />
-))
-NavigationMenu.displayName = 'NavigationMenu'
+  <NavigationMenuPrimitive ref={ref} className={cn('relative z-10', className)} {...props} />
+));
+NavigationMenu.displayName = 'NavigationMenu';
 
 export {
   NavigationMenu,
@@ -28,4 +24,4 @@ export {
   NavigationMenuLink,
   NavigationMenuContent,
   NavigationMenuTrigger,
-}
+};
