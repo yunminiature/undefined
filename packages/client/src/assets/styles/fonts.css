@@ -1,0 +1,12 @@
+@font-face {
+  font-weight: 100 900;
+  font-family: Geist;
+  font-style: normal;
+  font-stretch: 75% 125%;
+  src: url("../fonts/Geist-VariableFont_wght.ttf") format("truetype-variations");
+  font-display: swap;
+}
+
+:root {
+  --font-sans: "Geist";
+}
