@@ -16,6 +16,8 @@ import { Provider } from 'react-redux';
 import { store } from './store';
 import { Toaster } from './components/ui/sonner';
 import { AuthLayout } from './layouts/AuthLayout';
+import Error400 from './pages/Error400';
+import Error500 from './pages/Error500';
 
 function App() {
   return (
@@ -31,6 +33,8 @@ function App() {
             <Route path='forum' element={<Forum />} />
             <Route path='forum/create' element={<CreateTopic />} />
             <Route path='forum/topic/:id' element={<ForumTopic />} />
+            <Route path='error/400' element={<Error400 />} />
+            <Route path='error/500' element={<Error500 />} />
           </Route>
 
           <Route element={<AuthLayout />}>
