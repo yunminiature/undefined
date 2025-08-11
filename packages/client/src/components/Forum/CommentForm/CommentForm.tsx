@@ -30,10 +30,9 @@ type CommentFormData = z.infer<typeof commentSchema>;
 
 interface CommentFormProps {
   topicId: string;
-  onCommentAdded: (comment: Comment) => void;
 }
 
-export const CommentForm: React.FC<CommentFormProps> = ({ topicId, onCommentAdded }) => {
+export const CommentForm: React.FC<CommentFormProps> = ({ topicId }) => {
   const dispatch = useAppDispatch();
   const loading = useAppSelector(selectForumLoading);
 
@@ -48,7 +47,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({ topicId, onCommentAdde
 
   const onSubmit = async (data: CommentFormData) => {
     try {
-      const result = await dispatch(
+      await dispatch(
         addComment({
           topicId,
           content: data.content,
@@ -58,7 +57,6 @@ export const CommentForm: React.FC<CommentFormProps> = ({ topicId, onCommentAdde
 
       toast.success('Comment added!');
       reset();
-      onCommentAdded(result.comment);
     } catch (error) {
       console.error('Error adding comment:', error);
       toast.error('Error adding comment');

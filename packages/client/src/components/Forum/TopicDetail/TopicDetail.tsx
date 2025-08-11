@@ -43,10 +43,6 @@ export const TopicDetail: React.FC = () => {
     };
   }, [id, navigate, dispatch]);
 
-  const handleCommentAdded = (newComment: Comment) => {
-    console.log(newComment);
-  };
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -170,7 +166,7 @@ export const TopicDetail: React.FC = () => {
       </div>
 
       {/* Comment Form */}
-      <CommentForm topicId={topic.id} onCommentAdded={handleCommentAdded} />
+      <CommentForm topicId={topic.id} />
     </div>
   );
 };
