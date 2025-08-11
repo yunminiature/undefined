@@ -1,15 +1,15 @@
-import React from 'react';
 import ErrorComponent from '@/components/common/ErrorComponent';
+import { Component, ErrorInfo, ReactNode } from 'react';
 
 type ErrorBoundaryProps = {
-  children: React.ReactNode;
-  fallback?: React.ReactNode;
-  onError?: (error: Error, info: React.ErrorInfo) => void;
+  children: ReactNode;
+  fallback?: ReactNode;
+  onError?: (error: Error, info: ErrorInfo) => void;
 };
 
 type ErrorBoundaryState = { hasError: boolean; error?: Error };
 
-export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   state: ErrorBoundaryState = { hasError: false };
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {

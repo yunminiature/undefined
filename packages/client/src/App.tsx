@@ -24,7 +24,7 @@ import { BoundaryByRoute } from '@/layouts/BoundaryByRoute';
 function App() {
   return (
     //Глобальный Boundary для отслеживания ошибок роутера, провайдеров, которыми обернуты страницы и т.д.
-    <ErrorBoundary fallback={SafeErrorFallback()}>
+    <ErrorBoundary fallback={<SafeErrorFallback />}>
       <Provider store={store}>
         <BrowserRouter>
           {/*Boundary для ошибок внутри страниц */}
