@@ -14,7 +14,6 @@ const links = [
   { to: '/game', label: 'Game' },
   { to: '/leaderboard', label: 'Leaderboard' },
   { to: '/forum', label: 'Forum' },
-  { to: '/forum/topicId', label: 'ForumTopic' },
   { to: '/some-missing-page', label: '404' },
 ];
 

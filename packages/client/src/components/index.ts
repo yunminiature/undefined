@@ -4,3 +4,7 @@ export * from './UserInformationForm';
 export * from './ChangePasswordForm';
 export * from './ChangeAvatarDialog';
 export * from './ChangeAvatarForm';
+export * from './Forum/TopicsList';
+export * from './Forum/TopicDetail';
+export * from './Forum/CreateTopicForm';
+export * from './Forum/CommentForm';
