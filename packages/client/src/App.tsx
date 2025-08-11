@@ -18,33 +18,40 @@ import { Toaster } from './components/ui/sonner';
 import { AuthLayout } from './layouts/AuthLayout';
 import Error400 from './pages/Error400';
 import Error500 from './pages/Error500';
+import { ErrorBoundary, SafeErrorFallback } from './components';
+import { BoundaryByRoute } from '@/layouts/BoundaryByRoute';
 
 function App() {
   return (
-    <Provider store={store}>
-      <BrowserRouter>
-        <Routes>
-          <Route path='/' element={<MainLayout />}>
-            <Route index element={<Home />} />
-            <Route path='login' element={<Login />} />
-            <Route path='register' element={<Register />} />
-            <Route path='game' element={<Game />} />
-            <Route path='leaderboard' element={<Leaderboard />} />
-            <Route path='forum' element={<Forum />} />
-            <Route path='forum/:topicId' element={<ForumTopic />} />
-            <Route path='error/400' element={<Error400 />} />
-            <Route path='error/500' element={<Error500 />} />
-          </Route>
+    //Глобальный Boundary для отслеживания ошибок роутера, провайдеров, которыми обернуты страницы и т.д.
+    <ErrorBoundary fallback={SafeErrorFallback()}>
+      <Provider store={store}>
+        <BrowserRouter>
+          {/*Boundary для ошибок внутри страниц */}
+          <BoundaryByRoute>
+            <Routes>
+              <Route path='/' element={<MainLayout />}>
+                <Route index element={<Home />} />
+                <Route path='login' element={<Login />} />
+                <Route path='register' element={<Register />} />
+                <Route path='game' element={<Game />} />
+                <Route path='leaderboard' element={<Leaderboard />} />
+                <Route path='forum' element={<Forum />} />
+                <Route path='forum/:topicId' element={<ForumTopic />} />
+                <Route path='error/400' element={<Error400 />} />
+                <Route path='error/500' element={<Error500 />} />
+              </Route>
+              <Route element={<AuthLayout />}>
+                <Route path='profile' element={<SettingsPage />} />
+              </Route>
+              <Route path='*' element={<NotFound />} />
+            </Routes>
+          </BoundaryByRoute>
+        </BrowserRouter>
 
-          <Route element={<AuthLayout />}>
-            <Route path='profile' element={<SettingsPage />} />
-          </Route>
-
-          <Route path='*' element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-      <Toaster />
-    </Provider>
+        <Toaster />
+      </Provider>
+    </ErrorBoundary>
   );
 }
 
