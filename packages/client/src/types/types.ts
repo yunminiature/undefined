@@ -8,3 +8,20 @@ export interface User {
   avatar: string | null;
   email: string;
 }
+
+export interface Topic {
+  id: string;
+  title: string;
+  content: string;
+  author: string;
+  createdAt: string;
+  commentsCount: number;
+}
+
+export interface Comment {
+  id: string;
+  topicId: string;
+  content: string;
+  author: string;
+  createdAt: string;
+}

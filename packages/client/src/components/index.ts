@@ -6,3 +6,7 @@ export * from './ChangeAvatarDialog';
 export * from './ChangeAvatarForm';
 export * from './SignInForm';
 export * from './SignUpForm';
+export * from './Forum/TopicsList';
+export * from './Forum/TopicDetail';
+export * from './Forum/CreateTopicForm';
+export * from './Forum/CommentForm';

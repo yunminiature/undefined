@@ -4,12 +4,12 @@ import MainLayout from './layouts/MainLayout';
 import Home from './pages/Home';
 import Game from './pages/Game';
 import Leaderboard from './pages/Leaderboard';
-import Forum from './pages/Forum';
-import ForumTopic from './pages/ForumTopic';
+import Forum from './pages/Forum/Forum';
+import ForumTopic from './pages/Forum/ForumTopic';
 import NotFound from './pages/NotFound';
 
 import './App.css';
-import { SettingsPage } from './pages';
+import { SettingsPage, CreateTopic } from './pages';
 import { Provider } from 'react-redux';
 import { store } from './store';
 import { Toaster } from './components/ui/sonner';
@@ -29,7 +29,8 @@ function App() {
             <Route path='game' element={<Game />} />
             <Route path='leaderboard' element={<Leaderboard />} />
             <Route path='forum' element={<Forum />} />
-            <Route path='forum/:topicId' element={<ForumTopic />} />
+            <Route path='forum/create' element={<CreateTopic />} />
+            <Route path='forum/topic/:id' element={<ForumTopic />} />
             <Route path='error/400' element={<Error400 />} />
             <Route path='error/500' element={<Error500 />} />
           </Route>

@@ -14,7 +14,6 @@ const links = [
   { to: '/game', label: 'Game' },
   { to: '/leaderboard', label: 'Leaderboard' },
   { to: '/forum', label: 'Forum' },
-  { to: '/forum/topicId', label: 'ForumTopic' },
   { to: '/error/400', label: '400' },
   { to: '/error/500', label: '500' },
 ];
