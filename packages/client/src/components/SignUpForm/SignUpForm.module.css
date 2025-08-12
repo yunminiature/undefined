@@ -1,0 +1,21 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+  width: 100%;
+}
+
+.fields {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(4, 1fr);
+  gap: var(--s-1) var(--s-6);
+}
+
+@media (max-width: 767px) {
+  .fields {
+    grid-template-columns: 1fr;
+    grid-auto-flow: row;
+  }
+}
