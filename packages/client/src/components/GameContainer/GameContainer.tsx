@@ -2,12 +2,12 @@ import { GameBoardCanvas } from '@/components/GameBoardCanvas/GameBoardCanvas';
 import { useGameBoard } from '@/hooks/use-game-board';
 
 export const GameContainer = () => {
-  const { state, reset } = useGameBoard();
+  const { gameState, reset } = useGameBoard();
 
   return (
     <div className='flex flex-col gap-6 items-center p-4'>
       <div className='w-full min-w-[300px] max-w-md sm:max-w-lg lg:w-[32rem] aspect-square'>
-        <GameBoardCanvas board={state.board} />
+        <GameBoardCanvas board={gameState.board} />
       </div>
       <div>
         <button

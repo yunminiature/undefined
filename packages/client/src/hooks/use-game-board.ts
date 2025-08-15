@@ -4,10 +4,10 @@ import { GameState, MOVE_DIRECTION } from '@/types/game';
 import { KEY_TO_DIRECTION } from '@/utils/game-constants';
 
 export function useGameBoard() {
-  const [state, setState] = useState<GameState>(() => getInitialGameState());
+  const [gameState, setGameState] = useState<GameState>(() => getInitialGameState());
 
   function reset() {
-    setState(getInitialGameState());
+    setGameState(getInitialGameState());
   }
 
   const handleKey = useCallback((e: KeyboardEvent) => {
@@ -17,7 +17,7 @@ export function useGameBoard() {
       return;
     }
 
-    setState((prev) => {
+    setGameState((prev) => {
       if (prev.isGameOver || prev.isWon) {
         return prev;
       }
@@ -46,5 +46,5 @@ export function useGameBoard() {
     return () => window.removeEventListener('keydown', handleKey);
   }, [handleKey]);
 
-  return { state, reset };
+  return { gameState, reset };
 }
