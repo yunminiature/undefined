@@ -7,14 +7,13 @@ import {
 import { NavLink, Outlet } from 'react-router-dom';
 
 const links = [
-  { to: '/register', label: 'Register' },
-  { to: '/login', label: 'Login' },
+  { to: '/sign-up', label: 'Sign Up' },
+  { to: '/sign-in', label: 'Sign In' },
   { to: '/profile', label: 'Profile' },
   { to: '/', label: 'Home' },
   { to: '/game', label: 'Game' },
   { to: '/leaderboard', label: 'Leaderboard' },
   { to: '/forum', label: 'Forum' },
-  { to: '/forum/topicId', label: 'ForumTopic' },
   { to: '/error/400', label: '400' },
   { to: '/error/500', label: '500' },
 ];
