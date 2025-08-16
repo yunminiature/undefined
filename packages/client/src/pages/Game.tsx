@@ -1,5 +1,5 @@
-import { GameContainer } from '@/components/GameContainer/GameContainer'
+import { GameContainer } from '@/components/GameContainer/GameContainer';
 
 export default function Game() {
-  return <GameContainer />
+  return <GameContainer />;
 }

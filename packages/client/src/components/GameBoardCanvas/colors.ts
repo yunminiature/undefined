@@ -1,7 +1,7 @@
 const TEXT_COLOR = {
   dark: '#2d2d2d',
   light: '#ffffff',
-}
+};
 export const getTileColor = (value: number) =>
   ({
     2: { fill: '#f8bfc4', text: TEXT_COLOR.dark },
@@ -15,9 +15,9 @@ export const getTileColor = (value: number) =>
     512: { fill: '#5671df', text: TEXT_COLOR.light },
     1024: { fill: '#3986eb', text: TEXT_COLOR.light },
     2048: { fill: '#22a0f7', text: TEXT_COLOR.light },
-  }[value] ?? { fill: '#111', text: TEXT_COLOR.light })
+  }[value] ?? { fill: '#111', text: TEXT_COLOR.light });
 
 export const BG_COLORS = {
   board: '#F7FAFC',
   emptyTile: '#E2E8F0',
-} as const
+} as const;
