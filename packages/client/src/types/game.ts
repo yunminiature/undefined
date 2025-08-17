@@ -1,6 +1,6 @@
-import { GAME_CONFIG } from '@/utils/game-constants'
+import { GAME_CONFIG } from '@/utils/game-constants';
 
-export type GameBoard = number[][]
+export type GameBoard = number[][];
 
 export enum MOVE_DIRECTION {
   UP = 'up',
@@ -10,10 +10,10 @@ export enum MOVE_DIRECTION {
 }
 
 export type GameState = {
-  board: GameBoard
-  score: number
-  isGameOver: boolean
-  isWon: boolean
-}
+  board: GameBoard;
+  score: number;
+  isGameOver: boolean;
+  isWon: boolean;
+};
 
-export type WinValue = typeof GAME_CONFIG.WIN_VALUE
+export type WinValue = typeof GAME_CONFIG.WIN_VALUE;

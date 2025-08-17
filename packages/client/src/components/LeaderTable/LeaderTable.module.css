@@ -1,0 +1,17 @@
+.leaderWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-6);
+}
+
+.leaderTitle {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.leaderTableContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}

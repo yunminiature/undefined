@@ -9,11 +9,11 @@ export const GAME_CONFIG = {
     TWO: 2,
     FOUR: 4,
   },
-} as const
+} as const;
 
 export const KEY_TO_DIRECTION = {
   ArrowUp: 'up',
   ArrowDown: 'down',
   ArrowLeft: 'left',
   ArrowRight: 'right',
-} as const
+} as const;
