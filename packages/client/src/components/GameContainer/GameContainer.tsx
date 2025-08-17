@@ -1,19 +1,13 @@
-import { useGameBoard } from '@/hooks/use-game-board';
+import { toast } from 'sonner';
 import { useState, useMemo } from 'react';
+
+import { useGameBoard } from '@/hooks/use-game-board';
 
 import { GameWelcome } from './GameWelcome';
 import { GamePlay } from './GamePlay';
 import { GameHeader } from './GameHeader';
 import { GameActions } from './GameActions';
-
-const GAME_STATUSES = {
-  NOT_STARTED: 'not-started',
-  PLAYING: 'playing',
-  WON: 'won',
-  LOST: 'lost',
-} as const;
-
-type GameStatus = typeof GAME_STATUSES[keyof typeof GAME_STATUSES];
+import { GameStatus } from './types';
 
 export const GameContainer = () => {
   const { gameState, reset } = useGameBoard();
@@ -21,38 +15,43 @@ export const GameContainer = () => {
 
   const gameStatus = useMemo((): GameStatus => {
     if (!isGameStarted) {
-      return GAME_STATUSES.NOT_STARTED;
+      return 'not-started';
     }
     if (gameState.isWon) {
-      return GAME_STATUSES.WON;
+      return 'won';
     }
     if (gameState.isGameOver) {
-      return GAME_STATUSES.LOST;
+      return 'lost';
     }
-    return GAME_STATUSES.PLAYING;
+    return 'playing';
   }, [isGameStarted, gameState.isWon, gameState.isGameOver]);
 
   const handlePlayAgain = () => {
-    reset();
+    try {
+      reset();
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to reset game');
+    }
   };
 
   const handleBackToMenu = () => {
-    setIsGameStarted(false);
-    reset();
+    try {
+      setIsGameStarted(false);
+      reset();
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
     <div className='flex flex-col gap-6 items-center justify-center'>
-      {gameStatus === GAME_STATUSES.NOT_STARTED && <GameWelcome onStartGame={() => setIsGameStarted(true)} />}
+      {gameStatus === 'not-started' && <GameWelcome onStartGame={() => setIsGameStarted(true)} />}
 
-      {(gameStatus === GAME_STATUSES.PLAYING ||
-        gameStatus === GAME_STATUSES.WON ||
-        gameStatus === GAME_STATUSES.LOST) && (
+      {(gameStatus === 'playing' || gameStatus === 'won' || gameStatus === 'lost') && (
         <>
-          <GameHeader gameStatus={gameStatus} isWon={gameStatus === GAME_STATUSES.WON} />
-
+          <GameHeader gameStatus={gameStatus} />
           <GamePlay board={gameState.board} />
-
           <GameActions
             gameStatus={gameStatus}
             onReset={reset}

@@ -1,3 +1,4 @@
+import { Gamepad2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -67,7 +68,9 @@ export const GameWelcome = ({ onStartGame }: GameWelcomeProps) => {
         <div className='pt-4 border-t border-border/50'>
           <div className='text-center space-y-4'>
             <p className='text-sm text-muted-foreground'>Ready to start your 2048 journey?</p>
-            <Button onClick={onStartGame}>🎮 Start Game</Button>
+            <Button onClick={onStartGame}>
+              <Gamepad2 /> Start Game
+            </Button>
           </div>
         </div>
       </CardContent>

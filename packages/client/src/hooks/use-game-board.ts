@@ -6,9 +6,9 @@ import { KEY_TO_DIRECTION } from '@/utils/game-constants';
 export function useGameBoard() {
   const [gameState, setGameState] = useState<GameState>(() => getInitialGameState());
 
-  function reset() {
+  const reset = useCallback(() => {
     setGameState(getInitialGameState());
-  }
+  }, []);
 
   const handleKey = useCallback((e: KeyboardEvent) => {
     const direction = KEY_TO_DIRECTION[e.key as keyof typeof KEY_TO_DIRECTION];

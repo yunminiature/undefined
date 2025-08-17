@@ -1,10 +1,11 @@
+import { RefreshCcw, RotateCcw, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 import shared from '../shared.module.css';
-import s from './GameActions.module.css';
+import { GameStatus } from '../types';
 
 interface GameActionsProps {
-  gameStatus: 'playing' | 'won' | 'lost';
+  gameStatus: GameStatus;
   onReset: () => void;
   onPlayAgain: () => void;
   onBackToMenu: () => void;
@@ -13,16 +14,20 @@ interface GameActionsProps {
 export const GameActions = ({ gameStatus, onReset, onPlayAgain, onBackToMenu }: GameActionsProps) => {
   const backToMenuButton = (
     <Button onClick={onBackToMenu} variant='outline'>
-      ← Back to Menu
+      <ArrowLeft /> Back to Menu
     </Button>
   );
 
   return (
     <div className={`${shared.gameBlock} flex gap-4 justify-center`}>
       {gameStatus === 'playing' ? (
-        <Button onClick={onReset}>🔄 Reset Game</Button>
+        <Button onClick={onReset}>
+          <RefreshCcw /> Reset Game
+        </Button>
       ) : (
-        <Button onClick={onPlayAgain}>🎮 Play Again</Button>
+        <Button onClick={onPlayAgain}>
+          <RotateCcw /> Play Again
+        </Button>
       )}
       {backToMenuButton}
     </div>
