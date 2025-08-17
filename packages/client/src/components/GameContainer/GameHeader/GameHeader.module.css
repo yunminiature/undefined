@@ -1,3 +1,3 @@
 .gameHeader {
-  @apply h-[72px] text-center space-y-2;
+  @apply w-full min-h-[72px] text-center;
 }

@@ -50,7 +50,7 @@ export const GameContainer = () => {
 
       {(gameStatus === 'playing' || gameStatus === 'won' || gameStatus === 'lost') && (
         <>
-          <GameHeader gameStatus={gameStatus} />
+          <GameHeader gameStatus={gameStatus} score={gameState.score} />
           <GamePlay board={gameState.board} />
           <GameActions
             gameStatus={gameStatus}
