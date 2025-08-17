@@ -1,0 +1,23 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100dvh;
+  gap: var(--s-6);
+  justify-content: center;
+  align-items: center;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-6);
+  width: 100%;
+  max-width: 744px;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-6);
+}
