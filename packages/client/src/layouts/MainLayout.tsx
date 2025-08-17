@@ -43,7 +43,7 @@ export default function MainLayout() {
           </NavigationMenuList>
         </NavigationMenu>
       </header>
-      <main className='flex-1 p-6'>
+      <main className='flex-1 p-6 flex justify-center'>
         <Outlet />
       </main>
       <footer className='border-t px-6 py-4 text-center text-sm text-muted-foreground'>© 2025 undefined team</footer>

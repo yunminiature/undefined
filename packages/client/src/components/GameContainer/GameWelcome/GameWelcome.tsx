@@ -1,7 +1,8 @@
-import { Button } from '../ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { RulePoint } from './RulePoint';
-import { ArrowKey } from './ArrowKey';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
+import { RulePoint } from './RulePoint/RulePoint';
+import { ArrowKey } from './ArrowKey/ArrowKey';
 
 interface GameWelcomeProps {
   onStartGame: () => void;
@@ -40,7 +41,7 @@ export const GameWelcome = ({ onStartGame }: GameWelcomeProps) => {
     <Card className='shadow-lg'>
       <CardHeader className='text-center'>
         <div className='space-y-2'>
-          <CardTitle className='text-4xl font-bold text-foreground'>So you want to play 2048?</CardTitle>
+          <CardTitle className='text-3xl font-bold text-foreground'>So you want to play 2048?</CardTitle>
           <CardDescription className='text-lg'>
             Get ready to challenge your mind with this addictive puzzle game!
           </CardDescription>
@@ -66,12 +67,7 @@ export const GameWelcome = ({ onStartGame }: GameWelcomeProps) => {
         <div className='pt-4 border-t border-border/50'>
           <div className='text-center space-y-4'>
             <p className='text-sm text-muted-foreground'>Ready to start your 2048 journey?</p>
-            <Button
-              onClick={onStartGame}
-              className='px-8 py-3 text-lg font-semibold transition-all duration-200 transform hover:scale-105 shadow-lg'
-            >
-              🎮 Start Game
-            </Button>
+            <Button onClick={onStartGame}>🎮 Start Game</Button>
           </div>
         </div>
       </CardContent>

@@ -1,0 +1,3 @@
+.gameBlock {
+  @apply w-full max-w-md sm:max-w-lg lg:w-[32rem];
+}
