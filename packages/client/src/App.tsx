@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
 import Home from './pages/Home';
 import Game from './pages/Game';
-import Leaderboard from './pages/Leaderboard';
 import Forum from './pages/Forum/Forum';
 import ForumTopic from './pages/Forum/ForumTopic';
 import NotFound from './pages/NotFound';
@@ -20,6 +19,7 @@ import { ErrorBoundary, SafeErrorFallback } from './components';
 import { BoundaryByRoute } from '@/layouts/BoundaryByRoute';
 import { SignInPage } from './pages/SignIn';
 import { SignUpPage } from './pages/SignUp';
+import { Leaderboard } from '@/pages/Leaderboard';
 
 function App() {
   return (

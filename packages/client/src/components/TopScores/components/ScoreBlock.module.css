@@ -1,0 +1,19 @@
+.cardWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-6);
+  padding: var(--s-4);
+  width: 100%;
+}
+
+.scoreTitle {
+  font-size: 64px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.scoreDescription {
+  font-size: 18px;
+  line-height: 1.5;
+  color: hsl(var(--muted-foreground));
+}
