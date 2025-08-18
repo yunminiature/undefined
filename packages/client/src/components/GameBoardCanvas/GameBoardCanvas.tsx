@@ -170,3 +170,5 @@ export const GameBoardCanvas = ({ board }: Props) => {
     <canvas ref={canvasRef} className='w-full h-full aspect-square border border-border rounded-md bg-background' />
   );
 };
+
+export { findChangedTiles, setupCanvas, drawBackground, drawTile, drawBoard, drawChangedTiles };
