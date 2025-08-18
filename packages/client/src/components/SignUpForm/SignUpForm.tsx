@@ -4,21 +4,50 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from '../ui/input';
 import { TITLE } from './SignUpForm.constants';
 import { Button } from '../ui/button';
+import { useSignUpMutation } from '@/api/auth';
 
 import s from './SignUpForm.module.css';
+import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/providers';
+import { useEffect } from 'react';
+
+const initialValues = {
+  email: '',
+  login: '',
+  first_name: '',
+  second_name: '',
+  phone: '',
+  password: '',
+  confirmPassword: '',
+};
 
 export const SignUpForm = () => {
-  const form = useForm();
+  const form = useForm({
+    defaultValues: initialValues,
+  });
+  const [signUp, { isLoading, isSuccess, error }] = useSignUpMutation();
+  const navigate = useNavigate();
+  const { refreshUserInfo } = useAuth();
 
-  const onSubmit = async () => {
+  const onSubmit = async (values: typeof initialValues) => {
     try {
-      // TODO: send request
+      const { confirmPassword, ...restValues } = values;
+      await signUp(restValues);
+      await refreshUserInfo();
     } catch (error: unknown) {
-      // TODO: handle error
+      toast.error('Sign up failed. Please try again later.');
     }
   };
 
-  const disabled = !form.formState.isValid; // TODO: add isLoading
+  useEffect(() => {
+    if (isSuccess && !error) {
+      toast.success('Account created!');
+      navigate('/', { replace: true });
+    }
+  }, [isSuccess, error]);
+
+  const disabled = !form.formState.isValid || isLoading;
 
   return (
     <Form {...form}>
@@ -27,7 +56,7 @@ export const SignUpForm = () => {
           {/* EMAIL */}
           <FormField
             control={form.control}
-            name='phone'
+            name='email'
             render={({ field, fieldState }) => (
               <FormItem>
                 <FormLabel>{TITLE.EMAIL.LABEL}</FormLabel>

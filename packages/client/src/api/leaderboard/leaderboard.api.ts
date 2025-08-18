@@ -5,6 +5,7 @@ import type {
   LeaderboardQuery,
   PaginatedLeaderboardResponse,
 } from './leaderboard.dto';
+import { baseQueryWithAuth } from '@/api/baseQuery';
 
 const mockTopScores: TopScoresResponse = [
   { score: 15420, scoreDescription: 'Highest Score' },
@@ -80,9 +81,7 @@ const mockLeaderboard = generateMockLeaderboard();
 
 export const leaderboardApi = createApi({
   reducerPath: 'leaderboardApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: '/api/mock',
-  }),
+  baseQuery: baseQueryWithAuth,
   endpoints: (builder) => ({
     getTopScores: builder.query<TopScoresResponse, void>({
       queryFn: async () => {

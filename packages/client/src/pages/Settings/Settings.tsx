@@ -4,9 +4,11 @@ import { ChevronLeft } from 'lucide-react';
 
 import s from './Settings.module.css';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/providers';
 
 export const SettingsPage = () => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const onBack = () => {
     navigate(-1);
@@ -57,7 +59,7 @@ export const SettingsPage = () => {
           <li className={s.settingsItem}>
             <section className={s.section}>
               <SectionHeading title='Sign out' subtitle='We’ll miss you! Tap the button to sign out.' />
-              <Button variant='destructive' className='w-max'>
+              <Button variant='destructive' className='w-max' onClick={logout}>
                 Sign out
               </Button>
             </section>

@@ -1,9 +1,13 @@
 import { useGetGreetingQuery } from '@/api/server';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
+import { useAuth } from '@/providers';
+import { useNavigate } from 'react-router-dom';
 
 export default function Home() {
   const { data, isSuccess, error } = useGetGreetingQuery();
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (isSuccess && data) {
@@ -17,6 +21,14 @@ export default function Home() {
     }
   }, [error]);
 
+  const handleStartPlaying = () => {
+    if (isAuthenticated) {
+      navigate('/game');
+    } else {
+      navigate('/sign-in');
+    }
+  };
+
   return (
     <div className='flex flex-col items-center justify-center text-center'>
       <h1 className='text-4xl font-bold mb-4'>Welcome to 2048</h1>
@@ -25,12 +37,12 @@ export default function Home() {
         and reach the mythical 2048 tile. Every move counts — plan wisely and don’t let the board fill up!
       </p>
       <img src='/preview.png' alt='2048 game preview' className='w-full max-w-xs rounded-md shadow-lg mb-8' />
-      <a
-        href='/game'
+      <button
+        onClick={handleStartPlaying}
         className='inline-block bg-black text-white px-6 py-3 rounded-lg shadow hover:bg-gray-800 transition'
       >
-        Start Playing
-      </a>
+        {isAuthenticated ? 'Start Playing' : 'Sign In to Play'}
+      </button>
     </div>
   );
 }
