@@ -22,7 +22,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const logout = async () => {
     try {
-      logoutQuery();
+      await logoutQuery();
       dispatch(clearUser());
     } catch (error) {
       toast.error('Logout failed. Please try again later.');
