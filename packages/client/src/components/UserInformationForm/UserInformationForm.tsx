@@ -30,7 +30,7 @@ export const UserInformationForm = () => {
     } catch (e) {
       // TODO: handle error
     }
-  }
+  };
 
   const disabled = !form.formState.isValid || form.formState.isSubmitting;
 
@@ -40,14 +40,14 @@ export const UserInformationForm = () => {
         {/* LOGIN */}
         <FormField
           control={form.control}
-          name="login"
+          name='login'
           render={({ field, fieldState }) => (
             <FormItem>
               <FormLabel>{TITLE.LOGIN.LABEL}</FormLabel>
               <FormControl>
                 <Input
                   placeholder={TITLE.LOGIN.PLACEHOLDER}
-                  autoComplete="username"
+                  autoComplete='username'
                   {...field}
                   onBlur={() => {
                     form.trigger('login');
@@ -64,14 +64,14 @@ export const UserInformationForm = () => {
         {/* FIRST_NAME */}
         <FormField
           control={form.control}
-          name="first_name"
+          name='first_name'
           render={({ field, fieldState }) => (
             <FormItem>
               <FormLabel>{TITLE.FIRST_NAME.LABEL}</FormLabel>
               <FormControl>
                 <Input
                   placeholder={TITLE.FIRST_NAME.PLACEHOLDER}
-                  autoComplete="given-name"
+                  autoComplete='given-name'
                   {...field}
                   onBlur={() => {
                     form.trigger('first_name');
@@ -88,14 +88,14 @@ export const UserInformationForm = () => {
         {/* SECOND_NAME */}
         <FormField
           control={form.control}
-          name="second_name"
+          name='second_name'
           render={({ field, fieldState }) => (
             <FormItem>
               <FormLabel>{TITLE.SECOND_NAME.LABEL}</FormLabel>
               <FormControl>
                 <Input
                   placeholder={TITLE.SECOND_NAME.PLACEHOLDER}
-                  autoComplete="family-name"
+                  autoComplete='family-name'
                   {...field}
                   onBlur={() => {
                     form.trigger('second_name');
@@ -112,14 +112,14 @@ export const UserInformationForm = () => {
         {/* DISPLAY_NAME */}
         <FormField
           control={form.control}
-          name="display_name"
+          name='display_name'
           render={({ field, fieldState }) => (
             <FormItem>
               <FormLabel>{TITLE.DISPLAY_NAME.LABEL}</FormLabel>
               <FormControl>
                 <Input
                   placeholder={TITLE.DISPLAY_NAME.PLACEHOLDER}
-                  autoComplete="nickname"
+                  autoComplete='nickname'
                   {...field}
                   onBlur={() => {
                     form.trigger('display_name');
@@ -136,15 +136,15 @@ export const UserInformationForm = () => {
         {/* EMAIL */}
         <FormField
           control={form.control}
-          name="email"
+          name='email'
           render={({ field, fieldState }) => (
             <FormItem>
               <FormLabel>{TITLE.EMAIL.LABEL}</FormLabel>
               <FormControl>
                 <Input
-                  type="email"
+                  type='email'
                   placeholder={TITLE.EMAIL.PLACEHOLDER}
-                  autoComplete="email"
+                  autoComplete='email'
                   {...field}
                   onBlur={() => {
                     form.trigger('email');
@@ -161,15 +161,15 @@ export const UserInformationForm = () => {
         {/* PHONE */}
         <FormField
           control={form.control}
-          name="phone"
+          name='phone'
           render={({ field, fieldState }) => (
             <FormItem>
               <FormLabel>{TITLE.PHONE.LABEL}</FormLabel>
               <FormControl>
                 <Input
-                  type="tel"
+                  type='tel'
                   placeholder={TITLE.PHONE.PLACEHOLDER}
-                  autoComplete="tel"
+                  autoComplete='tel'
                   {...field}
                   onBlur={() => {
                     form.trigger('phone');
@@ -183,7 +183,9 @@ export const UserInformationForm = () => {
           )}
         />
 
-        <Button type="submit" className="w-max" disabled={disabled}>Save</Button>
+        <Button type='submit' className='w-max' disabled={disabled}>
+          Save
+        </Button>
       </form>
     </Form>
   );

@@ -19,7 +19,7 @@ export const SignUpForm = () => {
       second_name: '',
       phone: '',
       password: '',
-      confirmPassword: ''
+      confirmPassword: '',
     },
     mode: 'onChange',
     reValidateMode: 'onChange',
