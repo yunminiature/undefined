@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 
 import shared from '../shared.module.css';
 import { GameStatus } from '../types';
+import { FullscreenButton } from '../FullscreenButton';
 
 interface GameActionsProps {
   gameStatus: GameStatus;
@@ -19,17 +20,20 @@ export const GameActions = ({ gameStatus, onReset, onPlayAgain, onBackToMenu }: 
   );
 
   return (
-    <div className={`${shared.gameBlock} flex gap-4 justify-center`}>
-      {gameStatus === 'playing' ? (
-        <Button onClick={onReset}>
-          <RefreshCcw /> Reset Game
-        </Button>
-      ) : (
-        <Button onClick={onPlayAgain}>
-          <RotateCcw /> Play Again
-        </Button>
-      )}
-      {backToMenuButton}
+    <div className='flex flex-col gap-4 items-center'>
+      <div className={`${shared.gameBlock} flex gap-4 justify-center`}>
+        {gameStatus === 'playing' ? (
+          <Button onClick={onReset}>
+            <RefreshCcw /> Reset Game
+          </Button>
+        ) : (
+          <Button onClick={onPlayAgain}>
+            <RotateCcw /> Play Again
+          </Button>
+        )}
+        {backToMenuButton}
+      </div>
+      <FullscreenButton variant='outline' size='sm' />
     </div>
   );
 };

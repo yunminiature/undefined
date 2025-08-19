@@ -4,14 +4,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
 
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button, Label, Input, Textarea, Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { addComment, selectForumLoading } from '@/store/forumSlice';
-import { Comment } from '@/types';
 
 const commentSchema = z.object({
   content: z

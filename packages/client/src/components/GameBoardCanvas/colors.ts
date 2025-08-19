@@ -1,4 +1,4 @@
-const TEXT_COLOR = {
+export const TEXT_COLOR = {
   dark: '#2d2d2d',
   light: '#ffffff',
 };

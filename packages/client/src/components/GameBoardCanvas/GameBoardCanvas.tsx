@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react';
 
-import { findChangedTiles, setupCanvas, drawBackground, drawBoard, drawChangedTiles } from './utils';
+import { findChangedTiles, setupCanvas, drawBackground, drawTile, drawBoard, drawChangedTiles } from './utils';
 
 type Props = {
   board: number[][];
@@ -70,3 +70,5 @@ export const GameBoardCanvas = ({ board }: Props) => {
     <canvas ref={canvasRef} className='w-full h-full aspect-square border border-border rounded-md bg-background' />
   );
 };
+
+// export { findChangedTiles, setupCanvas, drawBackground, drawTile, drawBoard, drawChangedTiles };
