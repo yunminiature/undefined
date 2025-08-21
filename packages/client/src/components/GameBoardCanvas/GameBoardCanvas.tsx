@@ -27,7 +27,7 @@ export const GameBoardCanvas = ({ board, movements }: Props) => {
   } | null>(null);
 
   const animationRef = useRef<{
-    movement: TileMovement;
+    movements: TileMovement[];
     startTime: number;
     isAnimating: boolean;
   } | null>(null);
@@ -69,10 +69,8 @@ export const GameBoardCanvas = ({ board, movements }: Props) => {
 
     if (changes.length > 0) {
       if (movements.length > 0 && !animationRef.current?.isAnimating) {
-        const movement = movements[0];
-
         animationRef.current = {
-          movement: movement,
+          movements,
           startTime: performance.now(),
           isAnimating: true,
         };
@@ -89,17 +87,23 @@ export const GameBoardCanvas = ({ board, movements }: Props) => {
 
           drawBackground(ctx, boardSize);
 
-          const boardWithoutMovingTiles = createBoardWithoutMovingTiles(previousBoardRef.current, [
-            animationRef.current.movement,
-          ]);
+          const boardWithoutMovingTiles = createBoardWithoutMovingTiles(
+            previousBoardRef.current,
+            animationRef.current.movements
+          );
           drawBoard(ctx, boardWithoutMovingTiles, boardSize);
-          drawSlidingTile(ctx, animationRef.current.movement, boardSize, board.length, progress);
+
+          animationRef.current.movements.forEach((movement) => {
+            drawSlidingTile(ctx, movement, boardSize, board.length, progress);
+          });
 
           if (progress < 1) {
             requestAnimationFrame(animate);
           } else {
             animationRef.current.isAnimating = false;
+
             drawChangedTiles(ctx, changes, oldBoardSize, board.length);
+            console.log('update previousBoardRef.current');
             previousBoardRef.current = board.map((row) => [...row]);
           }
         };

@@ -8,8 +8,14 @@ export function generateEmptyBoard(): GameBoard {
 }
 
 export function getInitialGameState(): GameState {
-  let newBoard = generateEmptyBoard();
-  newBoard = placeRandomTile(newBoard);
+  // let newBoard = generateEmptyBoard();
+  // newBoard = placeRandomTile(newBoard);
+  const newBoard = [
+    [2, 2, 2, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+    [0, 2, 0, 2],
+  ];
 
   return {
     board: newBoard,
@@ -89,14 +95,16 @@ export function move(
   let gainedScore = 0;
   const movements: TileMovement[] = [];
 
-  const originalPositions = new Map<number, { x: number; y: number }>();
+  const originalPositions: { x: number; y: number; value: number }[] = [];
   for (let y = 0; y < GAME_BOARD_SIZE; y++) {
     for (let x = 0; x < GAME_BOARD_SIZE; x++) {
       if (rotated[y][x] !== 0) {
-        originalPositions.set(rotated[y][x], { x, y });
+        originalPositions.push({ x, y, value: rotated[y][x] });
       }
     }
   }
+
+  const usedPositions = new Set<string>();
 
   const newBoard = rotated.map((row, rowIndex) => {
     const newRow = [...row].filter((v) => v !== 0);
@@ -106,10 +114,21 @@ export function move(
         const mergedValue = newRow[i] * 2;
         gainedScore += mergedValue;
 
-        const tile1Pos = originalPositions.get(newRow[i]);
-        const tile2Pos = originalPositions.get(newRow[i + 1]);
+        const tile1Pos = originalPositions.find(
+          (pos) => pos.value === newRow[i] && !usedPositions.has(`${pos.x},${pos.y}`)
+        );
+
+        const tile2Pos = originalPositions.find(
+          (pos) =>
+            pos.value === newRow[i + 1] &&
+            !usedPositions.has(`${pos.x},${pos.y}`) &&
+            (pos.x !== tile1Pos?.x || pos.y !== tile1Pos?.y)
+        );
 
         if (tile1Pos && tile2Pos) {
+          usedPositions.add(`${tile1Pos.x},${tile1Pos.y}`);
+          usedPositions.add(`${tile2Pos.x},${tile2Pos.y}`);
+
           movements.push({
             oldX: tile1Pos.x,
             oldY: tile1Pos.y,
@@ -139,13 +158,18 @@ export function move(
     const merged = newRow.filter((v) => v !== 0);
 
     merged.forEach((value, newIndex) => {
-      const originalPos = originalPositions.get(value);
+      const originalPos = originalPositions.find(
+        (pos) => pos.value === value && !usedPositions.has(`${pos.x},${pos.y}`)
+      );
+
       if (originalPos && (originalPos.x !== newIndex || originalPos.y !== rowIndex)) {
         const alreadyTracked = movements.some(
           (m) => m.oldX === originalPos.x && m.oldY === originalPos.y && m.value === value
         );
 
         if (!alreadyTracked) {
+          usedPositions.add(`${originalPos.x},${originalPos.y}`);
+
           movements.push({
             oldX: originalPos.x,
             oldY: originalPos.y,
