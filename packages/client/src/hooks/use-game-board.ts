@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
-import { move, placeRandomTile, checkIsWon, checkIsGameOver, getInitialGameState } from '@/utils/game';
+import { move, placeRandomTile, checkIsWon, checkIsGameOver, getInitialGameState, TileMovement } from '@/utils/game';
 import { GameState, MOVE_DIRECTION } from '@/types/game';
 import { KEY_TO_DIRECTION } from '@/utils/game-constants';
 
 export function useGameBoard() {
   const [gameState, setGameState] = useState<GameState>(() => getInitialGameState());
+  const [lastMovements, setLastMovements] = useState<TileMovement[]>([]);
 
   const reset = useCallback(() => {
     setGameState(getInitialGameState());
@@ -22,13 +23,16 @@ export function useGameBoard() {
         return prev;
       }
 
-      const { newBoard, gainedScore, isMoved } = move(prev.board, direction as MOVE_DIRECTION);
+      const { newBoard, gainedScore, isMoved, movements } = move(prev.board, direction as MOVE_DIRECTION);
 
       if (!isMoved) {
         return prev;
       }
 
-      const updatedBoard = placeRandomTile(newBoard);
+      setLastMovements(movements);
+
+      // const updatedBoard = placeRandomTile(newBoard);
+      const updatedBoard = newBoard;
       const isGameOver = checkIsGameOver(updatedBoard);
       const isWon = checkIsWon(updatedBoard);
 
@@ -46,5 +50,5 @@ export function useGameBoard() {
     return () => window.removeEventListener('keydown', handleKey);
   }, [handleKey]);
 
-  return { gameState, reset };
+  return { gameState, reset, lastMovements };
 }

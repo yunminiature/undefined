@@ -65,6 +65,16 @@ export function checkIsGameOver(board: GameBoard): boolean {
   return true;
 }
 
+export interface TileMovement {
+  oldX: number;
+  oldY: number;
+  newX: number;
+  newY: number;
+  value: number;
+  merged: boolean;
+  mergedValue?: number;
+}
+
 export function move(
   board: GameBoard,
   direction: MOVE_DIRECTION
@@ -72,23 +82,81 @@ export function move(
   newBoard: GameBoard;
   gainedScore: number;
   isMoved: boolean;
+  movements: TileMovement[];
 } {
   const rotated = rotateBoard(board, direction);
   let isMoved = false;
   let gainedScore = 0;
+  const movements: TileMovement[] = [];
 
-  const newBoard = rotated.map((row) => {
+  const originalPositions = new Map<number, { x: number; y: number }>();
+  for (let y = 0; y < GAME_BOARD_SIZE; y++) {
+    for (let x = 0; x < GAME_BOARD_SIZE; x++) {
+      if (rotated[y][x] !== 0) {
+        originalPositions.set(rotated[y][x], { x, y });
+      }
+    }
+  }
+
+  const newBoard = rotated.map((row, rowIndex) => {
     const newRow = [...row].filter((v) => v !== 0);
 
     for (let i = 0; i < newRow.length - 1; i++) {
       if (newRow[i] === newRow[i + 1]) {
-        newRow[i] *= 2;
-        gainedScore += newRow[i];
+        const mergedValue = newRow[i] * 2;
+        gainedScore += mergedValue;
+
+        const tile1Pos = originalPositions.get(newRow[i]);
+        const tile2Pos = originalPositions.get(newRow[i + 1]);
+
+        if (tile1Pos && tile2Pos) {
+          movements.push({
+            oldX: tile1Pos.x,
+            oldY: tile1Pos.y,
+            newX: i,
+            newY: rowIndex,
+            value: newRow[i],
+            merged: true,
+            mergedValue,
+          });
+
+          movements.push({
+            oldX: tile2Pos.x,
+            oldY: tile2Pos.y,
+            newX: i,
+            newY: rowIndex,
+            value: newRow[i + 1],
+            merged: true,
+            mergedValue,
+          });
+        }
+
+        newRow[i] = mergedValue;
         newRow[i + 1] = 0;
       }
     }
 
     const merged = newRow.filter((v) => v !== 0);
+
+    merged.forEach((value, newIndex) => {
+      const originalPos = originalPositions.get(value);
+      if (originalPos && (originalPos.x !== newIndex || originalPos.y !== rowIndex)) {
+        const alreadyTracked = movements.some(
+          (m) => m.oldX === originalPos.x && m.oldY === originalPos.y && m.value === value
+        );
+
+        if (!alreadyTracked) {
+          movements.push({
+            oldX: originalPos.x,
+            oldY: originalPos.y,
+            newX: newIndex,
+            newY: rowIndex,
+            value,
+            merged: false,
+          });
+        }
+      }
+    });
 
     while (merged.length < GAME_BOARD_SIZE) {
       merged.push(0);
@@ -103,7 +171,25 @@ export function move(
 
   const restored = restoreBoard(newBoard, direction);
 
-  return { newBoard: restored, gainedScore, isMoved };
+  const restoredMovements = movements.map((movement) => {
+    const oldCoords = restoreCoordinates(movement.oldX, movement.oldY, direction, GAME_BOARD_SIZE);
+    const newCoords = restoreCoordinates(movement.newX, movement.newY, direction, GAME_BOARD_SIZE);
+
+    return {
+      ...movement,
+      oldX: oldCoords[0],
+      oldY: oldCoords[1],
+      newX: newCoords[0],
+      newY: newCoords[1],
+    };
+  });
+
+  return { newBoard: restored, gainedScore, isMoved, movements: restoredMovements };
+}
+
+export function getTileMovements(board: GameBoard, direction: MOVE_DIRECTION): TileMovement[] {
+  const { movements } = move(board, direction);
+  return movements;
 }
 
 function isArraysEqual(a: number[], b: number[]): boolean {
@@ -128,6 +214,19 @@ function rotateBoard(board: GameBoard, dir: MOVE_DIRECTION): GameBoard {
   }
 
   return rotated;
+}
+
+export function restoreCoordinates(x: number, y: number, dir: MOVE_DIRECTION, size: number): [number, number] {
+  if (dir === MOVE_DIRECTION.LEFT) {
+    return [x, y];
+  } else if (dir === MOVE_DIRECTION.RIGHT) {
+    return [size - 1 - x, y];
+  } else if (dir === MOVE_DIRECTION.UP) {
+    return [y, x];
+  } else if (dir === MOVE_DIRECTION.DOWN) {
+    return [y, size - 1 - x];
+  }
+  return [x, y];
 }
 
 function restoreBoard(board: GameBoard, dir: MOVE_DIRECTION): GameBoard {

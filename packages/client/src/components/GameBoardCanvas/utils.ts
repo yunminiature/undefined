@@ -1,6 +1,12 @@
 import { getTileColor, BG_COLORS } from './colors';
 import { CANVAS_CONFIG, FONT_CONFIG } from './constants';
 
+import { TileMovement } from '@/utils/game';
+
+export const easeOut = (t: number): number => {
+  return 1 - Math.pow(1 - t, 3);
+};
+
 export const findChangedTiles = (oldBoard: number[][], newBoard: number[][]) => {
   const changes: Array<{
     x: number;
@@ -108,4 +114,36 @@ export const drawChangedTiles = (
 
     drawTile(ctx, newValue, px, py, tileSize);
   });
+};
+
+export const drawSlidingTile = (
+  ctx: CanvasRenderingContext2D,
+  movement: TileMovement,
+  boardSize: number,
+  boardLength: number,
+  progress: number
+) => {
+  const cellSize = boardSize / boardLength;
+  const padding = CANVAS_CONFIG.PADDING;
+  const tileSize = cellSize - padding * 2;
+
+  const easedProgress = easeOut(progress);
+
+  const currentX = movement.oldX + (movement.newX - movement.oldX) * easedProgress;
+  const currentY = movement.oldY + (movement.newY - movement.oldY) * easedProgress;
+
+  const px = currentX * cellSize + padding;
+  const py = currentY * cellSize + padding;
+
+  drawTile(ctx, movement.value, px, py, tileSize);
+};
+
+export const createBoardWithoutMovingTiles = (board: number[][], movements: TileMovement[]): number[][] => {
+  const modifiedBoard = board.map((row) => [...row]);
+
+  movements.forEach((movement) => {
+    modifiedBoard[movement.oldY][movement.oldX] = 0;
+  });
+
+  return modifiedBoard;
 };

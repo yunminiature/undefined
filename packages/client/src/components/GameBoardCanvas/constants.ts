@@ -15,3 +15,8 @@ export const FONT_CONFIG = {
   FAMILY: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
   WEIGHT: 'bold',
 } as const;
+
+export const ANIMATION_CONFIG = {
+  DURATION: 1000,
+  EASING: 'ease-out',
+} as const;
