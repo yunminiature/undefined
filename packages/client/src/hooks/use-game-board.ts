@@ -11,6 +11,10 @@ export function useGameBoard() {
     setGameState(getInitialGameState());
   }, []);
 
+  const clearMovements = useCallback(() => {
+    setLastMovements([]);
+  }, []);
+
   const handleKey = useCallback((e: KeyboardEvent) => {
     const direction = KEY_TO_DIRECTION[e.key as keyof typeof KEY_TO_DIRECTION];
 
@@ -49,5 +53,5 @@ export function useGameBoard() {
     return () => window.removeEventListener('keydown', handleKey);
   }, [handleKey]);
 
-  return { gameState, reset, lastMovements };
+  return { gameState, reset, lastMovements, clearMovements };
 }

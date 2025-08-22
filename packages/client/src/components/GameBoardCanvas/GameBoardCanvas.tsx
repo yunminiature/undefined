@@ -7,6 +7,7 @@ import { TileMovement } from '@/utils/game';
 type Props = {
   board: number[][];
   movements: TileMovement[];
+  onAnimationComplete?: () => void;
 };
 
 type QueuedAnimation = {
@@ -14,7 +15,7 @@ type QueuedAnimation = {
   movements: TileMovement[];
 };
 
-export const GameBoardCanvas = ({ board, movements }: Props) => {
+export const GameBoardCanvas = ({ board, movements, onAnimationComplete }: Props) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const previousBoardRef = useRef<number[][]>([]);
   const canvasContextRef = useRef<{
@@ -29,6 +30,7 @@ export const GameBoardCanvas = ({ board, movements }: Props) => {
   const processNextAnimation = () => {
     if (animationQueueRef.current.length === 0) {
       isAnimatingRef.current = false;
+      onAnimationComplete?.();
       return;
     }
 
