@@ -32,7 +32,13 @@ export const GameBoardCanvas = ({ board, movements }: Props) => {
       return;
     }
 
-    const nextAnimation = animationQueueRef.current.shift()!;
+    const nextAnimation = animationQueueRef.current.shift();
+
+    if (!nextAnimation) {
+      isAnimatingRef.current = false;
+      return;
+    }
+
     const changes = findChangedTiles(previousBoardRef.current, nextAnimation.board);
 
     const queueLength = animationQueueRef.current.length;
