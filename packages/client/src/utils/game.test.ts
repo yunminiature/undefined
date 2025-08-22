@@ -50,12 +50,12 @@ describe('generateEmptyBoard()', () => {
 });
 
 describe('getInitialGameState()', () => {
-  it('should initialize with one tile, score=0, isGameOver=false, isWon=false', () => {
-    const state = withMockedRandom([0, 0], () => getInitialGameState());
+  it('should initialize with two tiles, score=0, isGameOver=false, isWon=false', () => {
+    const state = withMockedRandom([0, 0, 0.5, 0.5], () => getInitialGameState());
     expect(state.score).toBe(0);
     expect(state.isGameOver).toBe(false);
     expect(state.isWon).toBe(false);
-    expect(countNonZero(state.board)).toBe(1);
+    expect(countNonZero(state.board)).toBe(2);
   });
 });
 
