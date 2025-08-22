@@ -19,4 +19,6 @@ export const FONT_CONFIG = {
 export const ANIMATION_CONFIG = {
   DURATION: 200,
   EASING: 'ease-out',
+  MERGE_DURATION: 150,
+  MERGE_SCALE: 1.2,
 } as const;

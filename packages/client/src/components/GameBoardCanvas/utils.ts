@@ -1,10 +1,16 @@
 import { getTileColor, BG_COLORS } from './colors';
-import { CANVAS_CONFIG, FONT_CONFIG } from './constants';
+import { CANVAS_CONFIG, FONT_CONFIG, ANIMATION_CONFIG } from './constants';
 
 import { TileMovement } from '@/utils/game';
 
-export const easeOut = (t: number): number => {
+const easeOut = (t: number): number => {
   return 1 - Math.pow(1 - t, 3);
+};
+
+const calculateAnimationProgress = (startTime: number, duration: number): number => {
+  const currentTime = performance.now();
+  const elapsed = currentTime - startTime;
+  return Math.min(elapsed / duration, 1);
 };
 
 export const findChangedTiles = (oldBoard: number[][], newBoard: number[][]) => {
@@ -57,12 +63,19 @@ export const drawBackground = (ctx: CanvasRenderingContext2D, boardSize: number)
   ctx.fillRect(0, 0, boardSize, boardSize);
 };
 
-export const drawTile = (ctx: CanvasRenderingContext2D, cell: number, px: number, py: number, tileSize: number) => {
+const drawTile = (ctx: CanvasRenderingContext2D, cell: number, px: number, py: number, tileSize: number, scale = 1) => {
   if (cell !== 0) {
     const colors = getTileColor(cell);
     ctx.fillStyle = colors.fill;
+
+    const centerX = px + tileSize / 2;
+    const centerY = py + tileSize / 2;
+    const scaledSize = tileSize * scale;
+    const scaledX = centerX - scaledSize / 2;
+    const scaledY = centerY - scaledSize / 2;
+
     ctx.beginPath();
-    ctx.roundRect(px, py, tileSize, tileSize, CANVAS_CONFIG.TILE_BORDER_RADIUS);
+    ctx.roundRect(scaledX, scaledY, scaledSize, scaledSize, CANVAS_CONFIG.TILE_BORDER_RADIUS);
     ctx.fill();
 
     ctx.fillStyle = colors.text;
@@ -73,7 +86,7 @@ export const drawTile = (ctx: CanvasRenderingContext2D, cell: number, px: number
     ctx.font = `${FONT_CONFIG.WEIGHT} ${fontSize}px ${FONT_CONFIG.FAMILY}`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(String(cell), px + tileSize / 2, py + tileSize / 2);
+    ctx.fillText(String(cell), centerX, centerY);
   } else {
     ctx.fillStyle = BG_COLORS.emptyTile;
     ctx.beginPath();
@@ -116,7 +129,7 @@ export const drawChangedTiles = (
   });
 };
 
-export const drawSlidingTile = (
+const drawSlidingTile = (
   ctx: CanvasRenderingContext2D,
   movement: TileMovement,
   boardSize: number,
@@ -138,6 +151,23 @@ export const drawSlidingTile = (
   drawTile(ctx, movement.value, px, py, tileSize);
 };
 
+const drawTileWithMergeAnimation = (
+  ctx: CanvasRenderingContext2D,
+  cell: number,
+  px: number,
+  py: number,
+  tileSize: number,
+  mergeProgress: number
+) => {
+  if (cell === 0) {
+    drawTile(ctx, cell, px, py, tileSize);
+    return;
+  }
+
+  const scale = 1 + (ANIMATION_CONFIG.MERGE_SCALE - 1) * Math.sin(mergeProgress * Math.PI);
+  drawTile(ctx, cell, px, py, tileSize, scale);
+};
+
 export const createBoardWithoutMovingTiles = (board: number[][], movements: TileMovement[]): number[][] => {
   const modifiedBoard = board.map((row) => [...row]);
 
@@ -146,4 +176,107 @@ export const createBoardWithoutMovingTiles = (board: number[][], movements: Tile
   });
 
   return modifiedBoard;
+};
+
+export const startAnimation = (
+  movements: TileMovement[],
+  canvasContextRef: React.RefObject<{
+    ctx: CanvasRenderingContext2D;
+    rect: DOMRect;
+    boardSize: number;
+  } | null>,
+  previousBoard: number[][],
+  board: number[][],
+  onComplete: () => void
+) => {
+  if (!canvasContextRef.current || movements.length === 0) {
+    onComplete();
+    return;
+  }
+
+  let mergedTiles: Array<{ x: number; y: number; value: number }> = [];
+
+  const animateMovement = () => {
+    if (!canvasContextRef.current) {
+      return;
+    }
+
+    const startTime = performance.now();
+
+    const animate = () => {
+      if (!canvasContextRef.current) {
+        return;
+      }
+
+      const progress = calculateAnimationProgress(startTime, ANIMATION_CONFIG.DURATION);
+
+      const { ctx, boardSize } = canvasContextRef.current;
+
+      drawBackground(ctx, boardSize);
+
+      const boardWithoutMovingTiles = createBoardWithoutMovingTiles(previousBoard, movements);
+      drawBoard(ctx, boardWithoutMovingTiles, boardSize);
+
+      movements.forEach((movement) => {
+        drawSlidingTile(ctx, movement, boardSize, board.length, progress);
+      });
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        mergedTiles = movements
+          .filter((m) => m.merged && m.mergedValue !== undefined)
+          .map((m) => ({ x: m.newX, y: m.newY, value: m.mergedValue! }));
+
+        if (mergedTiles.length > 0) {
+          animateMerge();
+        } else {
+          onComplete();
+        }
+      }
+    };
+
+    requestAnimationFrame(animate);
+  };
+
+  const animateMerge = () => {
+    if (!canvasContextRef.current) {
+      return;
+    }
+
+    const startTime = performance.now();
+
+    const animate = () => {
+      if (!canvasContextRef.current) {
+        return;
+      }
+
+      const progress = calculateAnimationProgress(startTime, ANIMATION_CONFIG.MERGE_DURATION);
+
+      const { ctx, boardSize } = canvasContextRef.current;
+
+      drawBackground(ctx, boardSize);
+      drawBoard(ctx, board, boardSize);
+
+      const cellSize = boardSize / board.length;
+      const padding = CANVAS_CONFIG.PADDING;
+      const tileSize = cellSize - padding * 2;
+
+      mergedTiles.forEach(({ x, y, value }) => {
+        const px = x * cellSize + padding;
+        const py = y * cellSize + padding;
+        drawTileWithMergeAnimation(ctx, value, px, py, tileSize, progress);
+      });
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        onComplete();
+      }
+    };
+
+    requestAnimationFrame(animate);
+  };
+
+  animateMovement();
 };
