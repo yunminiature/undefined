@@ -14,6 +14,9 @@ export default defineConfig({
     __SERVER_PORT__: process.env.SERVER_PORT,
   },
   plugins: [react()],
+  build: {
+    manifest: true,
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
