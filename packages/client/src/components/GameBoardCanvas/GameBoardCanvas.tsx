@@ -9,6 +9,11 @@ type Props = {
   movements: TileMovement[];
 };
 
+type QueuedAnimation = {
+  board: number[][];
+  movements: TileMovement[];
+};
+
 export const GameBoardCanvas = ({ board, movements }: Props) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const previousBoardRef = useRef<number[][]>([]);
@@ -17,6 +22,47 @@ export const GameBoardCanvas = ({ board, movements }: Props) => {
     rect: DOMRect;
     boardSize: number;
   } | null>(null);
+
+  const isAnimatingRef = useRef(false);
+  const animationQueueRef = useRef<QueuedAnimation[]>([]);
+
+  const processNextAnimation = () => {
+    if (animationQueueRef.current.length === 0) {
+      isAnimatingRef.current = false;
+      return;
+    }
+
+    const nextAnimation = animationQueueRef.current.shift()!;
+    const changes = findChangedTiles(previousBoardRef.current, nextAnimation.board);
+
+    const queueLength = animationQueueRef.current.length;
+    const speedMultiplier = queueLength > 0 ? Math.min(1 + queueLength * 0.5, 3) : 1; // Max 3x speed
+
+    if (changes.length > 0) {
+      if (nextAnimation.movements.length > 0) {
+        startAnimation(
+          nextAnimation.movements,
+          canvasContextRef,
+          previousBoardRef.current,
+          nextAnimation.board,
+          () => {
+            previousBoardRef.current = nextAnimation.board.map((row) => [...row]);
+            processNextAnimation();
+          },
+          speedMultiplier
+        );
+      } else {
+        if (canvasContextRef.current) {
+          const { ctx, boardSize } = canvasContextRef.current;
+          drawChangedTiles(ctx, changes, boardSize, nextAnimation.board.length);
+        }
+        previousBoardRef.current = nextAnimation.board.map((row) => [...row]);
+        processNextAnimation();
+      }
+    } else {
+      processNextAnimation();
+    }
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -51,17 +97,11 @@ export const GameBoardCanvas = ({ board, movements }: Props) => {
       return;
     }
 
-    const changes = findChangedTiles(previousBoardRef.current, board);
+    animationQueueRef.current.push({ board, movements });
 
-    if (changes.length > 0) {
-      if (movements.length > 0) {
-        startAnimation(movements, canvasContextRef, previousBoardRef.current, board, () => {
-          previousBoardRef.current = board.map((row) => [...row]);
-        });
-      } else {
-        drawChangedTiles(ctx, changes, oldBoardSize, board.length);
-        previousBoardRef.current = board.map((row) => [...row]);
-      }
+    if (!isAnimatingRef.current) {
+      isAnimatingRef.current = true;
+      processNextAnimation();
     }
   }, [board]);
 
@@ -74,6 +114,8 @@ export const GameBoardCanvas = ({ board, movements }: Props) => {
 
       previousBoardRef.current = [];
       canvasContextRef.current = null;
+      isAnimatingRef.current = false;
+      animationQueueRef.current = [];
     };
   }, []);
 

@@ -191,7 +191,8 @@ export const startAnimation = (
   } | null>,
   previousBoard: number[][],
   board: number[][],
-  onComplete: () => void
+  onComplete: () => void,
+  speedMultiplier = 1
 ) => {
   if (!canvasContextRef.current || movements.length === 0) {
     onComplete();
@@ -212,7 +213,7 @@ export const startAnimation = (
         return;
       }
 
-      const progress = calculateAnimationProgress(startTime, ANIMATION_CONFIG.DURATION);
+      const progress = calculateAnimationProgress(startTime, ANIMATION_CONFIG.DURATION / speedMultiplier);
 
       const { ctx, boardSize } = canvasContextRef.current;
 
@@ -253,7 +254,7 @@ export const startAnimation = (
         return;
       }
 
-      const progress = calculateAnimationProgress(startTime, ANIMATION_CONFIG.MERGE_DURATION);
+      const progress = calculateAnimationProgress(startTime, ANIMATION_CONFIG.MERGE_DURATION / speedMultiplier);
 
       const { ctx, boardSize } = canvasContextRef.current;
 
