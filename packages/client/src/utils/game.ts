@@ -10,6 +10,7 @@ export function generateEmptyBoard(): GameBoard {
 export function getInitialGameState(): GameState {
   let newBoard = generateEmptyBoard();
   newBoard = placeRandomTile(newBoard);
+  newBoard = placeRandomTile(newBoard);
 
   return {
     board: newBoard,
