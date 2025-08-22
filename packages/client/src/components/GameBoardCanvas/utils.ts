@@ -3,6 +3,10 @@ import { CANVAS_CONFIG, FONT_CONFIG, ANIMATION_CONFIG } from './constants';
 
 import { TileMovement } from '@/utils/game';
 
+const isMergedTile = (m: TileMovement): m is TileMovement & { merged: true; mergedValue: number } => {
+  return m.merged && m.mergedValue !== undefined;
+};
+
 const easeOut = (t: number): number => {
   return 1 - Math.pow(1 - t, 3);
 };
@@ -224,9 +228,7 @@ export const startAnimation = (
       if (progress < 1) {
         requestAnimationFrame(animate);
       } else {
-        mergedTiles = movements
-          .filter((m) => m.merged && m.mergedValue !== undefined)
-          .map((m) => ({ x: m.newX, y: m.newY, value: m.mergedValue! }));
+        mergedTiles = movements.filter(isMergedTile).map((m) => ({ x: m.newX, y: m.newY, value: m.mergedValue }));
 
         if (mergedTiles.length > 0) {
           animateMerge();
