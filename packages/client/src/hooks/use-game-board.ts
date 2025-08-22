@@ -22,6 +22,8 @@ export function useGameBoard() {
       return;
     }
 
+    e.preventDefault();
+
     setGameState((prev) => {
       if (prev.isGameOver || prev.isWon) {
         return prev;
