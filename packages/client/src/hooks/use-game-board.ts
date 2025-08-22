@@ -31,8 +31,7 @@ export function useGameBoard() {
 
       setLastMovements(movements);
 
-      // const updatedBoard = placeRandomTile(newBoard);
-      const updatedBoard = newBoard;
+      const updatedBoard = placeRandomTile(newBoard);
       const isGameOver = checkIsGameOver(updatedBoard);
       const isWon = checkIsWon(updatedBoard);
 

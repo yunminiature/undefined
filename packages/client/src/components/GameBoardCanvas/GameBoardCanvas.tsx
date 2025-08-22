@@ -10,6 +10,8 @@ import {
   drawSlidingTile,
   createBoardWithoutMovingTiles,
 } from './utils';
+import { ANIMATION_CONFIG } from './constants';
+
 import { TileMovement } from '@/utils/game';
 
 type Props = {
@@ -83,7 +85,7 @@ export const GameBoardCanvas = ({ board, movements }: Props) => {
           const { ctx, boardSize } = canvasContextRef.current;
           const currentTime = performance.now();
           const elapsed = currentTime - animationRef.current.startTime;
-          const progress = Math.min(elapsed / 1000, 1);
+          const progress = Math.min(elapsed / ANIMATION_CONFIG.DURATION, 1);
 
           drawBackground(ctx, boardSize);
 

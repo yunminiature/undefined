@@ -8,14 +8,8 @@ export function generateEmptyBoard(): GameBoard {
 }
 
 export function getInitialGameState(): GameState {
-  // let newBoard = generateEmptyBoard();
-  // newBoard = placeRandomTile(newBoard);
-  const newBoard = [
-    [2, 2, 2, 0],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0],
-    [0, 2, 0, 2],
-  ];
+  let newBoard = generateEmptyBoard();
+  newBoard = placeRandomTile(newBoard);
 
   return {
     board: newBoard,
@@ -90,185 +84,144 @@ export function move(
   isMoved: boolean;
   movements: TileMovement[];
 } {
-  const rotated = rotateBoard(board, direction);
-  let isMoved = false;
-  let gainedScore = 0;
   const movements: TileMovement[] = [];
+  let gainedScore = 0;
 
-  const originalPositions: { x: number; y: number; value: number }[] = [];
-  for (let y = 0; y < GAME_BOARD_SIZE; y++) {
-    for (let x = 0; x < GAME_BOARD_SIZE; x++) {
-      if (rotated[y][x] !== 0) {
-        originalPositions.push({ x, y, value: rotated[y][x] });
-      }
+  const { lines, mapIdx, reverseOutput } = extractLines(board, direction);
+
+  const newLines = lines.map((line, lineIndex) =>
+    processLine(line, lineIndex, mapIdx, (score) => (gainedScore += score), movements)
+  );
+
+  const newBoard = assembleBoard(newLines, direction, GAME_BOARD_SIZE, reverseOutput);
+  const isMoved = !areBoardsEqual(board, newBoard);
+
+  return {
+    newBoard,
+    gainedScore,
+    isMoved,
+    movements,
+  };
+}
+
+function extractLines(
+  board: GameBoard,
+  direction: MOVE_DIRECTION
+): {
+  lines: number[][];
+  mapIdx: (lineIdx: number, posIdx: number) => { x: number; y: number };
+  reverseOutput: boolean;
+} {
+  const size = board.length;
+  const lines: number[][] = [];
+  let mapIdx: (lineIdx: number, posIdx: number) => { x: number; y: number };
+  let reverseOutput = false;
+
+  if (direction === MOVE_DIRECTION.LEFT || direction === MOVE_DIRECTION.RIGHT) {
+    for (let y = 0; y < size; y++) {
+      lines.push(board[y].slice());
+    }
+    mapIdx = (lineIdx, posIdx) =>
+      direction === MOVE_DIRECTION.LEFT ? { x: posIdx, y: lineIdx } : { x: size - 1 - posIdx, y: lineIdx };
+
+    if (direction === MOVE_DIRECTION.RIGHT) {
+      lines.forEach((line) => line.reverse());
+      reverseOutput = true;
+    }
+  } else {
+    for (let x = 0; x < size; x++) {
+      lines.push(board.map((row) => row[x]));
+    }
+    mapIdx = (lineIdx, posIdx) =>
+      direction === MOVE_DIRECTION.UP ? { x: lineIdx, y: posIdx } : { x: lineIdx, y: size - 1 - posIdx };
+
+    if (direction === MOVE_DIRECTION.DOWN) {
+      lines.forEach((line) => line.reverse());
+      reverseOutput = true;
     }
   }
 
-  const usedPositions = new Set<string>();
+  return { lines, mapIdx, reverseOutput };
+}
 
-  const newBoard = rotated.map((row, rowIndex) => {
-    const newRow = [...row].filter((v) => v !== 0);
+function processLine(
+  line: number[],
+  lineIndex: number,
+  mapIdx: (lineIdx: number, posIdx: number) => { x: number; y: number },
+  addScore: (score: number) => void,
+  movements: TileMovement[]
+): number[] {
+  const size = line.length;
+  const newLine: number[] = [];
+  const mergedFlags = new Array(size).fill(false);
 
-    for (let i = 0; i < newRow.length - 1; i++) {
-      if (newRow[i] === newRow[i + 1]) {
-        const mergedValue = newRow[i] * 2;
-        gainedScore += mergedValue;
+  for (let i = 0; i < size; i++) {
+    const value = line[i];
+    if (value === 0) continue;
 
-        const tile1Pos = originalPositions.find(
-          (pos) => pos.value === newRow[i] && !usedPositions.has(`${pos.x},${pos.y}`)
-        );
+    if (newLine.length > 0 && newLine[newLine.length - 1] === value && !mergedFlags[newLine.length - 1]) {
+      const mergedValue = value * 2;
+      newLine[newLine.length - 1] = mergedValue;
+      mergedFlags[newLine.length - 1] = true;
+      addScore(mergedValue);
 
-        const tile2Pos = originalPositions.find(
-          (pos) =>
-            pos.value === newRow[i + 1] &&
-            !usedPositions.has(`${pos.x},${pos.y}`) &&
-            (pos.x !== tile1Pos?.x || pos.y !== tile1Pos?.y)
-        );
+      const source = mapIdx(lineIndex, i);
+      const target = mapIdx(lineIndex, newLine.length - 1);
 
-        if (tile1Pos && tile2Pos) {
-          usedPositions.add(`${tile1Pos.x},${tile1Pos.y}`);
-          usedPositions.add(`${tile2Pos.x},${tile2Pos.y}`);
+      movements.push({
+        oldX: source.x,
+        oldY: source.y,
+        newX: target.x,
+        newY: target.y,
+        value,
+        merged: true,
+        mergedValue,
+      });
+    } else {
+      const targetIndex = newLine.length;
+      newLine.push(value);
 
-          movements.push({
-            oldX: tile1Pos.x,
-            oldY: tile1Pos.y,
-            newX: i,
-            newY: rowIndex,
-            value: newRow[i],
-            merged: true,
-            mergedValue,
-          });
+      const source = mapIdx(lineIndex, i);
+      const target = mapIdx(lineIndex, targetIndex);
 
-          movements.push({
-            oldX: tile2Pos.x,
-            oldY: tile2Pos.y,
-            newX: i,
-            newY: rowIndex,
-            value: newRow[i + 1],
-            merged: true,
-            mergedValue,
-          });
-        }
-
-        newRow[i] = mergedValue;
-        newRow[i + 1] = 0;
-      }
+      movements.push({
+        oldX: source.x,
+        oldY: source.y,
+        newX: target.x,
+        newY: target.y,
+        value,
+        merged: false,
+      });
     }
+  }
 
-    const merged = newRow.filter((v) => v !== 0);
+  while (newLine.length < size) {
+    newLine.push(0);
+  }
 
-    merged.forEach((value, newIndex) => {
-      const originalPos = originalPositions.find(
-        (pos) => pos.value === value && !usedPositions.has(`${pos.x},${pos.y}`)
-      );
+  return newLine;
+}
 
-      if (originalPos && (originalPos.x !== newIndex || originalPos.y !== rowIndex)) {
-        const alreadyTracked = movements.some(
-          (m) => m.oldX === originalPos.x && m.oldY === originalPos.y && m.value === value
-        );
+function assembleBoard(newLines: number[][], direction: MOVE_DIRECTION, size: number, reverse: boolean): GameBoard {
+  const board: GameBoard = Array.from({ length: size }, () => new Array(size).fill(0));
 
-        if (!alreadyTracked) {
-          usedPositions.add(`${originalPos.x},${originalPos.y}`);
+  const lines = reverse ? newLines.map((l) => [...l].reverse()) : newLines;
 
-          movements.push({
-            oldX: originalPos.x,
-            oldY: originalPos.y,
-            newX: newIndex,
-            newY: rowIndex,
-            value,
-            merged: false,
-          });
-        }
-      }
+  if (direction === MOVE_DIRECTION.LEFT || direction === MOVE_DIRECTION.RIGHT) {
+    lines.forEach((line, y) => {
+      board[y] = line;
     });
-
-    while (merged.length < GAME_BOARD_SIZE) {
-      merged.push(0);
-    }
-
-    if (!isArraysEqual(merged, row)) {
-      isMoved = true;
-    }
-
-    return merged;
-  });
-
-  const restored = restoreBoard(newBoard, direction);
-
-  const restoredMovements = movements.map((movement) => {
-    const oldCoords = restoreCoordinates(movement.oldX, movement.oldY, direction, GAME_BOARD_SIZE);
-    const newCoords = restoreCoordinates(movement.newX, movement.newY, direction, GAME_BOARD_SIZE);
-
-    return {
-      ...movement,
-      oldX: oldCoords[0],
-      oldY: oldCoords[1],
-      newX: newCoords[0],
-      newY: newCoords[1],
-    };
-  });
-
-  return { newBoard: restored, gainedScore, isMoved, movements: restoredMovements };
-}
-
-export function getTileMovements(board: GameBoard, direction: MOVE_DIRECTION): TileMovement[] {
-  const { movements } = move(board, direction);
-  return movements;
-}
-
-function isArraysEqual(a: number[], b: number[]): boolean {
-  return a.every((val, idx) => val === b[idx]);
-}
-
-function rotateBoard(board: GameBoard, dir: MOVE_DIRECTION): GameBoard {
-  const rotated = generateEmptyBoard();
-
-  for (let y = 0; y < GAME_BOARD_SIZE; y++) {
-    for (let x = 0; x < GAME_BOARD_SIZE; x++) {
-      if (dir === MOVE_DIRECTION.LEFT) {
-        rotated[y][x] = board[y][x];
-      } else if (dir === MOVE_DIRECTION.RIGHT) {
-        rotated[y][x] = board[y][GAME_BOARD_SIZE - 1 - x];
-      } else if (dir === MOVE_DIRECTION.UP) {
-        rotated[y][x] = board[x][y];
-      } else if (dir === MOVE_DIRECTION.DOWN) {
-        rotated[y][x] = board[GAME_BOARD_SIZE - 1 - x][y];
-      }
-    }
+  } else {
+    lines.forEach((line, x) => {
+      line.forEach((val, y) => {
+        board[y][x] = val;
+      });
+    });
   }
 
-  return rotated;
+  return board;
 }
 
-export function restoreCoordinates(x: number, y: number, dir: MOVE_DIRECTION, size: number): [number, number] {
-  if (dir === MOVE_DIRECTION.LEFT) {
-    return [x, y];
-  } else if (dir === MOVE_DIRECTION.RIGHT) {
-    return [size - 1 - x, y];
-  } else if (dir === MOVE_DIRECTION.UP) {
-    return [y, x];
-  } else if (dir === MOVE_DIRECTION.DOWN) {
-    return [y, size - 1 - x];
-  }
-  return [x, y];
-}
-
-function restoreBoard(board: GameBoard, dir: MOVE_DIRECTION): GameBoard {
-  const restored = generateEmptyBoard();
-
-  for (let y = 0; y < GAME_BOARD_SIZE; y++) {
-    for (let x = 0; x < GAME_BOARD_SIZE; x++) {
-      if (dir === MOVE_DIRECTION.LEFT) {
-        restored[y][x] = board[y][x];
-      } else if (dir === MOVE_DIRECTION.RIGHT) {
-        restored[y][x] = board[y][GAME_BOARD_SIZE - 1 - x];
-      } else if (dir === MOVE_DIRECTION.UP) {
-        restored[x][y] = board[y][x];
-      } else if (dir === MOVE_DIRECTION.DOWN) {
-        restored[GAME_BOARD_SIZE - 1 - x][y] = board[y][x];
-      }
-    }
-  }
-
-  return restored;
+function areBoardsEqual(a: GameBoard, b: GameBoard): boolean {
+  return a.every((row, y) => row.every((val, x) => val === b[y][x]));
 }
