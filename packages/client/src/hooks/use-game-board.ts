@@ -3,16 +3,23 @@ import { move, placeRandomTile, checkIsWon, checkIsGameOver, getInitialGameState
 import { GameState, MOVE_DIRECTION } from '@/types/game';
 import { KEY_TO_DIRECTION } from '@/utils/game-constants';
 
+type GameUpdate = {
+  board: number[][];
+  movements: TileMovement[];
+  newTile?: { x: number; y: number; value: number };
+};
+
 export function useGameBoard() {
   const [gameState, setGameState] = useState<GameState>(() => getInitialGameState());
-  const [lastMovements, setLastMovements] = useState<TileMovement[]>([]);
+  const [gameUpdate, setGameUpdate] = useState<GameUpdate | null>(null);
 
   const reset = useCallback(() => {
     setGameState(getInitialGameState());
+    setGameUpdate(null);
   }, []);
 
-  const clearMovements = useCallback(() => {
-    setLastMovements([]);
+  const clearGameUpdate = useCallback(() => {
+    setGameUpdate(null);
   }, []);
 
   const handleKey = useCallback((e: KeyboardEvent) => {
@@ -35,9 +42,14 @@ export function useGameBoard() {
         return prev;
       }
 
-      setLastMovements(movements);
+      const { board: updatedBoard, newTile: placedTile } = placeRandomTile(newBoard);
 
-      const updatedBoard = placeRandomTile(newBoard);
+      setGameUpdate({
+        board: updatedBoard,
+        movements,
+        newTile: placedTile,
+      });
+
       const isGameOver = checkIsGameOver(updatedBoard);
       const isWon = checkIsWon(updatedBoard);
 
@@ -55,5 +67,5 @@ export function useGameBoard() {
     return () => window.removeEventListener('keydown', handleKey);
   }, [handleKey]);
 
-  return { gameState, reset, lastMovements, clearMovements };
+  return { gameState, reset, gameUpdate, clearGameUpdate };
 }

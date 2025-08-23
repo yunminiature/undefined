@@ -64,7 +64,7 @@ describe('placeRandomTile()', () => {
     const full: GameBoard = Array.from({ length: GAME_BOARD_SIZE }, () =>
       Array(GAME_BOARD_SIZE).fill(GAME_CONFIG.TILE_VALUES.TWO)
     );
-    const res = placeRandomTile(full);
+    const res = placeRandomTile(full).board;
     expect(res).toBe(full);
   });
 
@@ -75,7 +75,7 @@ describe('placeRandomTile()', () => {
       [2, 2, 0, 2],
       [2, 2, 2, 2],
     ];
-    const res = withMockedRandom([0.42, 0], () => placeRandomTile(board));
+    const res = withMockedRandom([0.42, 0], () => placeRandomTile(board).board);
     expect(res).not.toBe(board);
     expect(res[2][2]).toBe(GAME_CONFIG.TILE_VALUES.TWO);
   });
@@ -87,7 +87,7 @@ describe('placeRandomTile()', () => {
       [2, 2, 2, 2],
       [2, 2, 2, 2],
     ];
-    const res = withMockedRandom([0.5, 0.999], () => placeRandomTile(board));
+    const res = withMockedRandom([0.5, 0.999], () => placeRandomTile(board).board);
     expect(res[0][0]).toBe(GAME_CONFIG.TILE_VALUES.FOUR);
   });
 });

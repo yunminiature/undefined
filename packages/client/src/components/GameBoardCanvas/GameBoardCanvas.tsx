@@ -7,15 +7,17 @@ import { TileMovement } from '@/utils/game';
 type Props = {
   board: number[][];
   movements: TileMovement[];
+  newTile?: { x: number; y: number; value: number };
   onAnimationComplete?: () => void;
 };
 
 type QueuedAnimation = {
   board: number[][];
   movements: TileMovement[];
+  newTile?: { x: number; y: number; value: number };
 };
 
-export const GameBoardCanvas = ({ board, movements, onAnimationComplete }: Props) => {
+export const GameBoardCanvas = ({ board, movements, newTile, onAnimationComplete }: Props) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const previousBoardRef = useRef<number[][]>([]);
   const canvasContextRef = useRef<{
@@ -48,17 +50,18 @@ export const GameBoardCanvas = ({ board, movements, onAnimationComplete }: Props
 
     if (changes.length > 0) {
       if (nextAnimation.movements.length > 0) {
-        startAnimation(
-          nextAnimation.movements,
+        startAnimation({
+          movements: nextAnimation.movements,
           canvasContextRef,
-          previousBoardRef.current,
-          nextAnimation.board,
-          () => {
+          previousBoard: previousBoardRef.current,
+          board: nextAnimation.board,
+          onComplete: () => {
             previousBoardRef.current = nextAnimation.board.map((row) => [...row]);
             processNextAnimation();
           },
-          speedMultiplier
-        );
+          speedMultiplier,
+          newTile: nextAnimation.newTile,
+        });
       } else {
         if (canvasContextRef.current) {
           const { ctx, boardSize } = canvasContextRef.current;
@@ -105,7 +108,7 @@ export const GameBoardCanvas = ({ board, movements, onAnimationComplete }: Props
       return;
     }
 
-    animationQueueRef.current.push({ board, movements });
+    animationQueueRef.current.push({ board, movements, newTile });
 
     if (!isAnimatingRef.current) {
       isAnimatingRef.current = true;

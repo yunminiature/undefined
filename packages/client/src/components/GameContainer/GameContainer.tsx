@@ -10,7 +10,7 @@ import { GameActions } from './GameActions';
 import { GameStatus } from './types';
 
 export const GameContainer = () => {
-  const { gameState, reset, lastMovements, clearMovements } = useGameBoard();
+  const { gameState, reset, gameUpdate, clearGameUpdate } = useGameBoard();
   const [isGameStarted, setIsGameStarted] = useState(false);
 
   const gameStatus = useMemo((): GameStatus => {
@@ -51,7 +51,7 @@ export const GameContainer = () => {
       {(gameStatus === 'playing' || gameStatus === 'won' || gameStatus === 'lost') && (
         <>
           <GameHeader gameStatus={gameStatus} score={gameState.score} />
-          <GamePlay board={gameState.board} movements={lastMovements} onAnimationComplete={clearMovements} />
+          <GamePlay board={gameState.board} gameUpdate={gameUpdate} onAnimationComplete={clearGameUpdate} />
           <GameActions
             gameStatus={gameStatus}
             onReset={reset}

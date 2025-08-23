@@ -1,5 +1,6 @@
 import { getTileColor, BG_COLORS } from './colors';
 import { CANVAS_CONFIG, FONT_CONFIG, ANIMATION_CONFIG } from './constants';
+import { AnimationConfig } from './types';
 
 import { TileMovement } from '@/utils/game';
 
@@ -15,6 +16,19 @@ const calculateAnimationProgress = (startTime: number, duration: number): number
   const currentTime = performance.now();
   const elapsed = currentTime - startTime;
   return Math.min(elapsed / duration, 1);
+};
+
+const calculateTileDimensions = (boardSize: number, boardLength: number) => {
+  const cellSize = boardSize / boardLength;
+  const padding = CANVAS_CONFIG.PADDING;
+  const tileSize = cellSize - padding * 2;
+  return { cellSize, padding, tileSize };
+};
+
+const calculateTilePosition = (x: number, y: number, cellSize: number, padding: number) => {
+  const px = x * cellSize + padding;
+  const py = y * cellSize + padding;
+  return { px, py };
 };
 
 export const findChangedTiles = (oldBoard: number[][], newBoard: number[][]) => {
@@ -100,16 +114,12 @@ const drawTile = (ctx: CanvasRenderingContext2D, cell: number, px: number, py: n
 };
 
 export const drawBoard = (ctx: CanvasRenderingContext2D, board: number[][], boardSize: number) => {
-  const cellSize = boardSize / board.length;
-  const padding = CANVAS_CONFIG.PADDING;
+  const { cellSize, padding, tileSize } = calculateTileDimensions(boardSize, board.length);
 
   for (let y = 0; y < board.length; y++) {
     for (let x = 0; x < board[y].length; x++) {
       const cell = board[y][x];
-      const px = x * cellSize + padding;
-      const py = y * cellSize + padding;
-      const tileSize = cellSize - padding * 2;
-
+      const { px, py } = calculateTilePosition(x, y, cellSize, padding);
       drawTile(ctx, cell, px, py, tileSize);
     }
   }
@@ -121,16 +131,23 @@ export const drawChangedTiles = (
   boardSize: number,
   boardLength: number
 ) => {
-  const cellSize = boardSize / boardLength;
-  const padding = CANVAS_CONFIG.PADDING;
-  const tileSize = cellSize - padding * 2;
+  const { cellSize, padding, tileSize } = calculateTileDimensions(boardSize, boardLength);
 
   changes.forEach(({ x, y, newValue }) => {
-    const px = x * cellSize + padding;
-    const py = y * cellSize + padding;
-
+    const { px, py } = calculateTilePosition(x, y, cellSize, padding);
     drawTile(ctx, newValue, px, py, tileSize);
   });
+};
+
+export const drawNewTile = (
+  ctx: CanvasRenderingContext2D,
+  newTile: { x: number; y: number; value: number },
+  boardSize: number,
+  boardLength: number
+) => {
+  const { cellSize, padding, tileSize } = calculateTileDimensions(boardSize, boardLength);
+  const { px, py } = calculateTilePosition(newTile.x, newTile.y, cellSize, padding);
+  drawTile(ctx, newTile.value, px, py, tileSize);
 };
 
 const drawSlidingTile = (
@@ -140,18 +157,14 @@ const drawSlidingTile = (
   boardLength: number,
   progress: number
 ) => {
-  const cellSize = boardSize / boardLength;
-  const padding = CANVAS_CONFIG.PADDING;
-  const tileSize = cellSize - padding * 2;
+  const { cellSize, padding, tileSize } = calculateTileDimensions(boardSize, boardLength);
 
   const easedProgress = easeOut(progress);
 
   const currentX = movement.oldX + (movement.newX - movement.oldX) * easedProgress;
   const currentY = movement.oldY + (movement.newY - movement.oldY) * easedProgress;
 
-  const px = currentX * cellSize + padding;
-  const py = currentY * cellSize + padding;
-
+  const { px, py } = calculateTilePosition(currentX, currentY, cellSize, padding);
   drawTile(ctx, movement.value, px, py, tileSize);
 };
 
@@ -182,18 +195,9 @@ export const createBoardWithoutMovingTiles = (board: number[][], movements: Tile
   return modifiedBoard;
 };
 
-export const startAnimation = (
-  movements: TileMovement[],
-  canvasContextRef: React.RefObject<{
-    ctx: CanvasRenderingContext2D;
-    rect: DOMRect;
-    boardSize: number;
-  } | null>,
-  previousBoard: number[][],
-  board: number[][],
-  onComplete: () => void,
-  speedMultiplier = 1
-) => {
+export const startAnimation = (config: AnimationConfig) => {
+  const { movements, canvasContextRef, previousBoard, board, onComplete, speedMultiplier = 1, newTile } = config;
+
   if (!canvasContextRef.current || movements.length === 0) {
     onComplete();
     return;
@@ -234,6 +238,9 @@ export const startAnimation = (
         if (mergedTiles.length > 0) {
           animateMerge();
         } else {
+          if (newTile) {
+            drawNewTile(ctx, newTile, boardSize, board.length);
+          }
           onComplete();
         }
       }
@@ -274,6 +281,9 @@ export const startAnimation = (
       if (progress < 1) {
         requestAnimationFrame(animate);
       } else {
+        if (newTile) {
+          drawNewTile(ctx, newTile, boardSize, board.length);
+        }
         onComplete();
       }
     };

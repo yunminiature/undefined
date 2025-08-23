@@ -9,8 +9,8 @@ export function generateEmptyBoard(): GameBoard {
 
 export function getInitialGameState(): GameState {
   let newBoard = generateEmptyBoard();
-  newBoard = placeRandomTile(newBoard);
-  newBoard = placeRandomTile(newBoard);
+  newBoard = placeRandomTile(newBoard).board;
+  newBoard = placeRandomTile(newBoard).board;
 
   return {
     board: newBoard,
@@ -20,7 +20,10 @@ export function getInitialGameState(): GameState {
   };
 }
 
-export function placeRandomTile(board: GameBoard): GameBoard {
+export function placeRandomTile(board: GameBoard): {
+  board: GameBoard;
+  newTile?: { x: number; y: number; value: number };
+} {
   const emptyTiles: [number, number][] = [];
 
   for (let y = 0; y < GAME_BOARD_SIZE; y++) {
@@ -32,16 +35,20 @@ export function placeRandomTile(board: GameBoard): GameBoard {
   }
 
   if (emptyTiles.length === 0) {
-    return board;
+    return { board };
   }
 
   const [y, x] = emptyTiles[Math.floor(Math.random() * emptyTiles.length)];
   const newBoard = board.map((row) => [...row]);
 
-  newBoard[y][x] =
+  const newValue =
     Math.random() < GAME_CONFIG.TILE_PROBABILITIES.TWO ? GAME_CONFIG.TILE_VALUES.TWO : GAME_CONFIG.TILE_VALUES.FOUR;
+  newBoard[y][x] = newValue;
 
-  return newBoard;
+  return {
+    board: newBoard,
+    newTile: { x, y, value: newValue },
+  };
 }
 
 export function checkIsWon(board: GameBoard): boolean {
