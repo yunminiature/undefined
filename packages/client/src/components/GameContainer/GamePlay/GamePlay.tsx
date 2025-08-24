@@ -3,7 +3,7 @@ import { TileMovement } from '@/utils/game';
 
 import shared from '../shared.module.css';
 
-type GameUpdate = {
+type AnimationData = {
   board: number[][];
   movements: TileMovement[];
   newTile?: { x: number; y: number; value: number };
@@ -11,17 +11,17 @@ type GameUpdate = {
 
 interface GamePlayProps {
   board: number[][];
-  gameUpdate: GameUpdate | null;
+  animationData: AnimationData | null;
   onAnimationComplete?: () => void;
 }
 
-export const GamePlay = ({ board, gameUpdate, onAnimationComplete }: GamePlayProps) => {
+export const GamePlay = ({ board, animationData, onAnimationComplete }: GamePlayProps) => {
   return (
     <div className={`${shared.gameBlock} min-w-[300px] aspect-square`}>
       <GameBoardCanvas
         board={board}
-        movements={gameUpdate?.movements || []}
-        newTile={gameUpdate?.newTile}
+        movements={animationData?.movements || []}
+        newTile={animationData?.newTile}
         onAnimationComplete={onAnimationComplete}
       />
     </div>
