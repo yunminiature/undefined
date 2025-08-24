@@ -1,76 +1,104 @@
-### Как запускать?
+# 2048 — веб-игра с регистрацией и профилем
 
-1. Убедитесь что у вас установлен `node` и `docker`
-2. Выполните команду `yarn bootstrap` - это обязательный шаг, без него ничего работать не будет :)
-3. Выполните команду `yarn dev`
-3. Выполните команду `yarn dev --scope=client` чтобы запустить только клиент
-4. Выполните команду `yarn dev --scope=server` чтобы запустить только server
+Добро пожаловать в **2048** — классическую головоломку, реализованную как современное SPA.  
+Проект написан на **React + TypeScript** с использованием **Vite**, стилизации через **TailwindCSS + shadcn ui**, валидации форм через **react-hook-form + zod**, и управлением состоянием через **Redux Toolkit**.
 
+[Описание игры](GAME.md)
+---
 
-### Как добавить зависимости?
-В этом проекте используется `monorepo` на основе [`lerna`](https://github.com/lerna/lerna)
+## ✨ Функционал
 
-Чтобы добавить зависимость для клиента 
-```yarn lerna add {your_dep} --scope client```
+- 🔑 **Регистрация и авторизация** (валидация на live input, blur, submit)
+- 👤 **Профиль** с возможностью изменять данные о себе  
+- 🏠 **Главная страница**  
+- 🎮 **Игра 2048**
+- 🏆 **Лидерборд** с лучшими игроками  
+- 💬 **Форум** с темами и комментариями  
 
-Для сервера
-```yarn lerna add {your_dep} --scope server```
+---
 
-И для клиента и для сервера
-```yarn lerna add {your_dep}```
+## 🛠️ Технологии
 
+- **React 18 + TypeScript**
+- **Vite** — быстрая сборка и dev-сервер
+- **Redux Toolkit** — глобальное состояние
+- **react-hook-form + zod** — формы и строгая валидация
+- **TailwindCSS + shadcn ui** — стилизация и UI-компоненты
+- **Jest + Testing Library** — тестирование
+- **ESLint + Prettier** — кодстайл
 
-Если вы хотите добавить dev зависимость, проделайте то же самое, но с флагом `dev`
-```yarn lerna add {your_dep} --dev --scope server```
+---
 
+## 📂 Структура
+
+```bash
+packages/client
+├── public              # статические ресурсы
+├── src
+│   ├── api             # запросы к API
+│   ├── assets          # картинки, иконки
+│   ├── components      # переиспользуемые компоненты (UI)
+│   ├── constants       # константы проекта
+│   ├── hooks           # кастомные хуки
+│   ├── layouts         # общие шаблоны страниц
+│   ├── lib             # утилиты/хелперы
+│   ├── pages           # страницы (SignIn, SignUp, Game, Leaderboard, Forum…)
+│   ├── store           # Redux store, slices
+│   ├── types           # общие TS-типы
+│   └── utils           # функции
+│   ├── App.tsx
+│   ├── main.tsx
+│   └── index.css
+├── components.json
+├── index.html
+├── jest.config.js
+├── nginx.conf
+└── package.json
+```
+
+---
+
+## 🚀 Запуск
+
+### Требования
+- Node.js **>=18**
+- npm / yarn / pnpm
+
+### Установка
+```bash
+cd packages/client
+npm install
+```
+
+### Запуск dev-сервера
+```bash
+npm run dev
+```
+
+### Сборка
+```bash
+npm run build
+```
+
+### Предпросмотр production-сборки
+```bash
+npm run preview
+```
 
 ### Тесты
+```bash
+npm run test
+```
 
-Для клиента используется [`react-testing-library`](https://testing-library.com/docs/react-testing-library/intro/)
+---
 
-```yarn test```
+## 🌐 Основные роуты
 
-### Линтинг
-
-```yarn lint```
-
-### Форматирование prettier
-
-```yarn format```
-
-### Production build
-
-```yarn build```
-
-И чтобы посмотреть что получилось
-
-
-`yarn preview --scope client`
-`yarn preview --scope server`
-
-## Хуки
-В проекте используется [lefthook](https://github.com/evilmartians/lefthook)
-Если очень-очень нужно пропустить проверки, используйте `--no-verify` (но не злоупотребляйте :)
-
-## Ой, ничего не работает :(
-
-Откройте issue, я приду :)
-
-## Автодеплой статики на vercel
-Зарегистрируйте аккаунт на [vercel](https://vercel.com/)
-Следуйте [инструкции](https://vitejs.dev/guide/static-deploy.html#vercel-for-git)
-В качестве `root directory` укажите `packages/client`
-
-Все ваши PR будут автоматически деплоиться на vercel. URL вам предоставит деплоящий бот
-
-## Production окружение в докере
-Перед первым запуском выполните `node init.js`
-
-
-`docker compose up` - запустит три сервиса
-1. nginx, раздающий клиентскую статику (client)
-2. node, ваш сервер (server)
-3. postgres, вашу базу данных (postgres)
-
-Если вам понадобится только один сервис, просто уточните какой в команде
-`docker compose up {sevice_name}`, например `docker compose up server`
+- `/` — главная
+- `/sign-in` — авторизация
+- `/sign-up` — регистрация
+- `/profile` — профиль
+- `/game` — сама игра 2048
+- `/leaderboard` — таблица лидеров
+- `/forum` — список тем
+- `/forum/:id` — топик
