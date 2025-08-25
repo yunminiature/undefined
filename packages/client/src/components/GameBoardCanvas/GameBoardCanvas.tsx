@@ -1,12 +1,23 @@
 import { useRef, useEffect } from 'react';
 
-import { findChangedTiles, setupCanvas, drawBackground, drawTile, drawBoard, drawChangedTiles } from './utils';
+import { findChangedTiles, setupCanvas, drawBackground, drawBoard, drawChangedTiles, startAnimation } from './utils';
+
+import { TileMovement } from '@/utils/game';
 
 type Props = {
   board: number[][];
+  movements: TileMovement[];
+  newTile?: { x: number; y: number; value: number };
+  onAnimationComplete?: () => void;
 };
 
-export const GameBoardCanvas = ({ board }: Props) => {
+type QueuedAnimation = {
+  board: number[][];
+  movements: TileMovement[];
+  newTile?: { x: number; y: number; value: number };
+};
+
+export const GameBoardCanvas = ({ board, movements, newTile, onAnimationComplete }: Props) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const previousBoardRef = useRef<number[][]>([]);
   const canvasContextRef = useRef<{
@@ -14,6 +25,55 @@ export const GameBoardCanvas = ({ board }: Props) => {
     rect: DOMRect;
     boardSize: number;
   } | null>(null);
+
+  const isAnimatingRef = useRef(false);
+  const animationQueueRef = useRef<QueuedAnimation[]>([]);
+
+  const processNextAnimation = () => {
+    if (animationQueueRef.current.length === 0) {
+      isAnimatingRef.current = false;
+      onAnimationComplete?.();
+      return;
+    }
+
+    const nextAnimation = animationQueueRef.current.shift();
+
+    if (!nextAnimation) {
+      isAnimatingRef.current = false;
+      return;
+    }
+
+    const changes = findChangedTiles(previousBoardRef.current, nextAnimation.board);
+
+    const queueLength = animationQueueRef.current.length;
+    const speedMultiplier = queueLength > 0 ? Math.min(1 + queueLength * 0.5, 3) : 1; // Max 3x speed
+
+    if (changes.length > 0) {
+      if (nextAnimation.movements.length > 0) {
+        startAnimation({
+          movements: nextAnimation.movements,
+          canvasContextRef,
+          previousBoard: previousBoardRef.current,
+          board: nextAnimation.board,
+          onComplete: () => {
+            previousBoardRef.current = nextAnimation.board.map((row) => [...row]);
+            processNextAnimation();
+          },
+          speedMultiplier,
+          newTile: nextAnimation.newTile,
+        });
+      } else {
+        if (canvasContextRef.current) {
+          const { ctx, boardSize } = canvasContextRef.current;
+          drawChangedTiles(ctx, changes, boardSize, nextAnimation.board.length);
+        }
+        previousBoardRef.current = nextAnimation.board.map((row) => [...row]);
+        processNextAnimation();
+      }
+    } else {
+      processNextAnimation();
+    }
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -48,13 +108,15 @@ export const GameBoardCanvas = ({ board }: Props) => {
       return;
     }
 
-    const changes = findChangedTiles(previousBoardRef.current, board);
+    animationQueueRef.current.push({ board, movements, newTile });
 
-    if (changes.length > 0) {
-      drawChangedTiles(ctx, changes, oldBoardSize, board.length);
-      previousBoardRef.current = board.map((row) => [...row]);
+    if (!isAnimatingRef.current) {
+      isAnimatingRef.current = true;
+      processNextAnimation();
     }
+  }, [board]);
 
+  useEffect(() => {
     return () => {
       if (canvasContextRef.current) {
         const { ctx, boardSize } = canvasContextRef.current;
@@ -63,12 +125,12 @@ export const GameBoardCanvas = ({ board }: Props) => {
 
       previousBoardRef.current = [];
       canvasContextRef.current = null;
+      isAnimatingRef.current = false;
+      animationQueueRef.current = [];
     };
-  }, [board]);
+  }, []);
 
   return (
     <canvas ref={canvasRef} className='w-full h-full aspect-square border border-border rounded-md bg-background' />
   );
 };
-
-// export { findChangedTiles, setupCanvas, drawBackground, drawTile, drawBoard, drawChangedTiles };

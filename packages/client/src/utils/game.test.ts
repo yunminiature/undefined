@@ -50,12 +50,12 @@ describe('generateEmptyBoard()', () => {
 });
 
 describe('getInitialGameState()', () => {
-  it('should initialize with one tile, score=0, isGameOver=false, isWon=false', () => {
-    const state = withMockedRandom([0, 0], () => getInitialGameState());
+  it('should initialize with two tiles, score=0, isGameOver=false, isWon=false', () => {
+    const state = withMockedRandom([0, 0, 0.5, 0.5], () => getInitialGameState());
     expect(state.score).toBe(0);
     expect(state.isGameOver).toBe(false);
     expect(state.isWon).toBe(false);
-    expect(countNonZero(state.board)).toBe(1);
+    expect(countNonZero(state.board)).toBe(2);
   });
 });
 
@@ -64,7 +64,7 @@ describe('placeRandomTile()', () => {
     const full: GameBoard = Array.from({ length: GAME_BOARD_SIZE }, () =>
       Array(GAME_BOARD_SIZE).fill(GAME_CONFIG.TILE_VALUES.TWO)
     );
-    const res = placeRandomTile(full);
+    const res = placeRandomTile(full).board;
     expect(res).toBe(full);
   });
 
@@ -75,7 +75,7 @@ describe('placeRandomTile()', () => {
       [2, 2, 0, 2],
       [2, 2, 2, 2],
     ];
-    const res = withMockedRandom([0.42, 0], () => placeRandomTile(board));
+    const res = withMockedRandom([0.42, 0], () => placeRandomTile(board).board);
     expect(res).not.toBe(board);
     expect(res[2][2]).toBe(GAME_CONFIG.TILE_VALUES.TWO);
   });
@@ -87,7 +87,7 @@ describe('placeRandomTile()', () => {
       [2, 2, 2, 2],
       [2, 2, 2, 2],
     ];
-    const res = withMockedRandom([0.5, 0.999], () => placeRandomTile(board));
+    const res = withMockedRandom([0.5, 0.999], () => placeRandomTile(board).board);
     expect(res[0][0]).toBe(GAME_CONFIG.TILE_VALUES.FOUR);
   });
 });
