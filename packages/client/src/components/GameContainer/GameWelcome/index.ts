@@ -1,0 +1,1 @@
+export { GameWelcome } from './GameWelcome';

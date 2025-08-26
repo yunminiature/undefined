@@ -1,14 +1,17 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/providers';
 
 interface ProtectedRouteProps {
   children: ReactNode;
   redirectTo?: string;
+  authRoute?: boolean;
 }
 
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, redirectTo = '/sign-in' }) => {
+export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, redirectTo = '/sign-in', authRoute }) => {
   const { isAuthenticated, isLoading } = useAuth();
+
+  const checkCondition = useMemo(() => (authRoute ? isAuthenticated : !isAuthenticated), [authRoute, isAuthenticated]);
 
   if (isLoading) {
     return (
@@ -20,7 +23,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, redire
     );
   }
 
-  if (!isAuthenticated) {
+  if (checkCondition) {
     return <Navigate to={redirectTo} replace />;
   }
 

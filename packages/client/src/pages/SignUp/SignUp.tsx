@@ -1,19 +1,9 @@
 import { Header, SignUpForm } from '@/components';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import s from './SignUp.module.css';
-import { useEffect } from 'react';
-import { useAuth } from '@/providers';
 
 export const SignUpPage = () => {
-  const { isAuthenticated } = useAuth();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/', { replace: true });
-    }
-  }, [isAuthenticated, navigate]);
   return (
     <div className={s.page}>
       <section className={s.section}>

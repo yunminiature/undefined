@@ -1,8 +1,12 @@
-import { useGetGreetingQuery } from '@/api/server';
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from '@/providers';
 import { useNavigate } from 'react-router-dom';
+
+import { useGetGreetingQuery } from '@/api/server';
+import { Button } from '@/components/ui/button';
+import { Gamepad2 } from 'lucide-react';
 
 export default function Home() {
   const { data, isSuccess, error } = useGetGreetingQuery();
@@ -37,12 +41,10 @@ export default function Home() {
         and reach the mythical 2048 tile. Every move counts — plan wisely and don’t let the board fill up!
       </p>
       <img src='/preview.png' alt='2048 game preview' className='w-full max-w-xs rounded-md shadow-lg mb-8' />
-      <button
-        onClick={handleStartPlaying}
-        className='inline-block bg-black text-white px-6 py-3 rounded-lg shadow hover:bg-gray-800 transition'
-      >
+      <Button onClick={handleStartPlaying}>
+        <Gamepad2 className='w-4 h-4 mr-2' />
         {isAuthenticated ? 'Start Playing' : 'Sign In to Play'}
-      </button>
+      </Button>
     </div>
   );
 }

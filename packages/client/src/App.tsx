@@ -79,8 +79,22 @@ function App() {
                 </Route>
 
                 <Route element={<AuthLayout />}>
-                  <Route path='sign-up' element={<SignUpPage />} />
-                  <Route path='sign-in' element={<SignInPage />} />
+                  <Route
+                    path='sign-up'
+                    element={
+                      <ProtectedRoute authRoute redirectTo='/'>
+                        <SignUpPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path='sign-in'
+                    element={
+                      <ProtectedRoute authRoute redirectTo='/'>
+                        <SignInPage />
+                      </ProtectedRoute>
+                    }
+                  />
                   <Route
                     path='profile'
                     element={

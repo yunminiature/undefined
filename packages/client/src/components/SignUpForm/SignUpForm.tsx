@@ -1,14 +1,15 @@
 import { useForm } from 'react-hook-form';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
+import { zodResolver } from '@hookform/resolvers/zod';
 
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 import { Input } from '../ui/input';
-import { TITLE } from './SignUpForm.constants';
 import { Button } from '../ui/button';
+import { TITLE } from './SignUpForm.constants';
 import { useSignUpMutation } from '@/api/auth';
 
+import { signUpSchema, SignUpValues } from './SignUpForm.schema';
 import s from './SignUpForm.module.css';
 import { toast } from 'sonner';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/providers';
 import { useEffect } from 'react';
 
@@ -23,14 +24,16 @@ const initialValues = {
 };
 
 export const SignUpForm = () => {
-  const form = useForm({
+  const form = useForm<SignUpValues>({
+    resolver: zodResolver(signUpSchema),
     defaultValues: initialValues,
+    mode: 'onChange',
+    reValidateMode: 'onChange',
   });
   const [signUp, { isLoading, isSuccess, error }] = useSignUpMutation();
-  const navigate = useNavigate();
   const { refreshUserInfo } = useAuth();
 
-  const onSubmit = async (values: typeof initialValues) => {
+  const onSubmit = async (values: SignUpValues) => {
     try {
       const { confirmPassword, ...restValues } = values;
       await signUp(restValues);
@@ -43,15 +46,14 @@ export const SignUpForm = () => {
   useEffect(() => {
     if (isSuccess && !error) {
       toast.success('Account created!');
-      navigate('/', { replace: true });
     }
   }, [isSuccess, error]);
 
-  const disabled = !form.formState.isValid || isLoading;
+  const disabled = !form.formState.isValid || form.formState.isSubmitting || isLoading;
 
   return (
     <Form {...form}>
-      <form className={s.form} onSubmit={form.handleSubmit(onSubmit)}>
+      <form className={s.form} onSubmit={form.handleSubmit(onSubmit)} noValidate>
         <div className={s.fields}>
           {/* EMAIL */}
           <FormField
@@ -61,7 +63,16 @@ export const SignUpForm = () => {
               <FormItem>
                 <FormLabel>{TITLE.EMAIL.LABEL}</FormLabel>
                 <FormControl>
-                  <Input type='email' placeholder={TITLE.EMAIL.PLACEHOLDER} autoComplete='email' {...field} />
+                  <Input
+                    type='email'
+                    placeholder={TITLE.EMAIL.PLACEHOLDER}
+                    autoComplete='email'
+                    {...field}
+                    onBlur={() => {
+                      form.trigger('email');
+                      field.onBlur?.();
+                    }}
+                  />
                 </FormControl>
                 {!fieldState.error && <FormDescription>{TITLE.EMAIL.DESCRIPTION}</FormDescription>}
                 <FormMessage />
@@ -77,7 +88,15 @@ export const SignUpForm = () => {
               <FormItem>
                 <FormLabel>{TITLE.LOGIN.LABEL}</FormLabel>
                 <FormControl>
-                  <Input placeholder={TITLE.LOGIN.PLACEHOLDER} autoComplete='username' {...field} />
+                  <Input
+                    placeholder={TITLE.LOGIN.PLACEHOLDER}
+                    autoComplete='username'
+                    {...field}
+                    onBlur={() => {
+                      form.trigger('login');
+                      field.onBlur?.();
+                    }}
+                  />
                 </FormControl>
                 {!fieldState.error && <FormDescription>{TITLE.LOGIN.DESCRIPTION}</FormDescription>}
                 <FormMessage />
@@ -93,7 +112,15 @@ export const SignUpForm = () => {
               <FormItem>
                 <FormLabel>{TITLE.FIRST_NAME.LABEL}</FormLabel>
                 <FormControl>
-                  <Input placeholder={TITLE.FIRST_NAME.PLACEHOLDER} autoComplete='given-name' {...field} />
+                  <Input
+                    placeholder={TITLE.FIRST_NAME.PLACEHOLDER}
+                    autoComplete='given-name'
+                    {...field}
+                    onBlur={() => {
+                      form.trigger('first_name');
+                      field.onBlur?.();
+                    }}
+                  />
                 </FormControl>
                 {!fieldState.error && <FormDescription>{TITLE.FIRST_NAME.DESCRIPTION}</FormDescription>}
                 <FormMessage />
@@ -109,7 +136,15 @@ export const SignUpForm = () => {
               <FormItem>
                 <FormLabel>{TITLE.SECOND_NAME.LABEL}</FormLabel>
                 <FormControl>
-                  <Input placeholder={TITLE.SECOND_NAME.PLACEHOLDER} autoComplete='family-name' {...field} />
+                  <Input
+                    placeholder={TITLE.SECOND_NAME.PLACEHOLDER}
+                    autoComplete='family-name'
+                    {...field}
+                    onBlur={() => {
+                      form.trigger('second_name');
+                      field.onBlur?.();
+                    }}
+                  />
                 </FormControl>
                 {!fieldState.error && <FormDescription>{TITLE.SECOND_NAME.DESCRIPTION}</FormDescription>}
                 <FormMessage />
@@ -125,7 +160,16 @@ export const SignUpForm = () => {
               <FormItem>
                 <FormLabel>{TITLE.PHONE.LABEL}</FormLabel>
                 <FormControl>
-                  <Input type='tel' placeholder={TITLE.PHONE.PLACEHOLDER} autoComplete='tel' {...field} />
+                  <Input
+                    type='tel'
+                    placeholder={TITLE.PHONE.PLACEHOLDER}
+                    autoComplete='tel'
+                    {...field}
+                    onBlur={() => {
+                      form.trigger('phone');
+                      field.onBlur?.();
+                    }}
+                  />
                 </FormControl>
                 {!fieldState.error && <FormDescription>{TITLE.PHONE.DESCRIPTION}</FormDescription>}
                 <FormMessage />
@@ -141,7 +185,16 @@ export const SignUpForm = () => {
               <FormItem>
                 <FormLabel>{TITLE.PASSWORD.LABEL}</FormLabel>
                 <FormControl>
-                  <Input type='password' placeholder={TITLE.PASSWORD.PLACEHOLDER} autoComplete='password' {...field} />
+                  <Input
+                    type='password'
+                    placeholder={TITLE.PASSWORD.PLACEHOLDER}
+                    autoComplete='password'
+                    {...field}
+                    onBlur={() => {
+                      form.trigger('password');
+                      field.onBlur?.();
+                    }}
+                  />
                 </FormControl>
                 {!fieldState.error && <FormDescription>{TITLE.PASSWORD.DESCRIPTION}</FormDescription>}
                 <FormMessage />
@@ -157,7 +210,15 @@ export const SignUpForm = () => {
               <FormItem>
                 <FormLabel>{TITLE.CONFIRM_PASSWORD.LABEL}</FormLabel>
                 <FormControl>
-                  <Input type='password' placeholder={TITLE.CONFIRM_PASSWORD.PLACEHOLDER} {...field} />
+                  <Input
+                    type='password'
+                    placeholder={TITLE.CONFIRM_PASSWORD.PLACEHOLDER}
+                    {...field}
+                    onBlur={() => {
+                      form.trigger('confirmPassword');
+                      field.onBlur?.();
+                    }}
+                  />
                 </FormControl>
                 {!fieldState.error && <FormDescription>{TITLE.CONFIRM_PASSWORD.DESCRIPTION}</FormDescription>}
                 <FormMessage />
