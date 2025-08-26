@@ -11,3 +11,4 @@ export * from './Forum/TopicsList';
 export * from './Forum/TopicDetail';
 export * from './Forum/CreateTopicForm';
 export * from './Forum/CommentForm';
+export * from './ProtectedRoute';

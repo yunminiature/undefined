@@ -5,35 +5,51 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import { TITLE } from './SignUpForm.constants';
+import { useSignUpMutation } from '@/api/auth';
 
 import { signUpSchema, SignUpValues } from './SignUpForm.schema';
 import s from './SignUpForm.module.css';
+import { toast } from 'sonner';
+import { useAuth } from '@/providers';
+import { useEffect } from 'react';
+
+const initialValues = {
+  email: '',
+  login: '',
+  first_name: '',
+  second_name: '',
+  phone: '',
+  password: '',
+  confirmPassword: '',
+};
 
 export const SignUpForm = () => {
   const form = useForm<SignUpValues>({
     resolver: zodResolver(signUpSchema),
-    defaultValues: {
-      email: '',
-      login: '',
-      first_name: '',
-      second_name: '',
-      phone: '',
-      password: '',
-      confirmPassword: '',
-    },
+    defaultValues: initialValues,
     mode: 'onChange',
     reValidateMode: 'onChange',
   });
+  const [signUp, { isLoading, isSuccess, error }] = useSignUpMutation();
+  const { refreshUserInfo } = useAuth();
 
   const onSubmit = async (values: SignUpValues) => {
     try {
-      // TODO: send request
+      const { confirmPassword, ...restValues } = values;
+      await signUp(restValues);
+      await refreshUserInfo();
     } catch (error: unknown) {
-      // TODO: handle error
+      toast.error('Sign up failed. Please try again later.');
     }
   };
 
-  const disabled = !form.formState.isValid || form.formState.isSubmitting;
+  useEffect(() => {
+    if (isSuccess && !error) {
+      toast.success('Account created!');
+    }
+  }, [isSuccess, error]);
+
+  const disabled = !form.formState.isValid || form.formState.isSubmitting || isLoading;
 
   return (
     <Form {...form}>

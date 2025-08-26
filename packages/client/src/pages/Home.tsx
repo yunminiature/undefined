@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useAuth } from '@/providers';
+import { useNavigate } from 'react-router-dom';
 
 import { useGetGreetingQuery } from '@/api/server';
 import { Button } from '@/components/ui/button';
@@ -8,6 +10,8 @@ import { Gamepad2 } from 'lucide-react';
 
 export default function Home() {
   const { data, isSuccess, error } = useGetGreetingQuery();
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (isSuccess && data) {
@@ -21,6 +25,14 @@ export default function Home() {
     }
   }, [error]);
 
+  const handleStartPlaying = () => {
+    if (isAuthenticated) {
+      navigate('/game');
+    } else {
+      navigate('/sign-in');
+    }
+  };
+
   return (
     <div className='flex flex-col items-center justify-center text-center'>
       <h1 className='text-4xl font-bold mb-4'>Welcome to 2048</h1>
@@ -29,11 +41,9 @@ export default function Home() {
         and reach the mythical 2048 tile. Every move counts — plan wisely and don’t let the board fill up!
       </p>
       <img src='/preview.png' alt='2048 game preview' className='w-full max-w-xs rounded-md shadow-lg mb-8' />
-      <Button asChild>
-        <Link to='/game'>
-          <Gamepad2 className='w-4 h-4' />
-          Play Game
-        </Link>
+      <Button onClick={handleStartPlaying}>
+        <Gamepad2 className='w-4 h-4 mr-2' />
+        {isAuthenticated ? 'Start Playing' : 'Sign In to Play'}
       </Button>
     </div>
   );

@@ -1,13 +1,10 @@
-import { BASE_API_URL } from '@/constants';
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
 import { ChangePasswordRequest, ChangePasswordResponse } from './users.dto';
+import { baseQueryWithAuth } from '@/api/baseQuery';
 
 export const usersApi = createApi({
   reducerPath: 'usersApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: BASE_API_URL,
-    credentials: 'include',
-  }),
+  baseQuery: baseQueryWithAuth,
   endpoints: (builder) => ({
     changePassword: builder.mutation<ChangePasswordResponse, ChangePasswordRequest>({
       query: (body) => ({

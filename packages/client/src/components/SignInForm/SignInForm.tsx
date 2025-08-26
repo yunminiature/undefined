@@ -8,24 +8,42 @@ import { TITLE } from './SignInForm.constants';
 
 import { signInSchema, SignInValues } from './SignInForm.schema';
 import s from './SignInForm.module.css';
+import { useSignInMutation } from '@/api/auth';
+import { toast } from 'sonner';
+import { useAuth } from '@/providers';
+import { useEffect } from 'react';
+
+const initialValues = {
+  login: '',
+  password: '',
+};
 
 export const SignInForm = () => {
   const form = useForm<SignInValues>({
     resolver: zodResolver(signInSchema),
-    defaultValues: { login: '', password: '' },
+    defaultValues: initialValues,
     mode: 'onChange',
     reValidateMode: 'onChange',
   });
+  const [signIn, { isLoading, isSuccess, error }] = useSignInMutation();
+  const { refreshUserInfo } = useAuth();
 
   const onSubmit = async (values: SignInValues) => {
     try {
-      // TODO: send request
+      await signIn({ login: values.login, password: values.password });
+      await refreshUserInfo();
     } catch (error: unknown) {
-      // TODO: handle error
+      toast.error('Login failed. Please try again later.');
     }
   };
 
-  const disabled = !form.formState.isValid || form.formState.isSubmitting;
+  useEffect(() => {
+    if (isSuccess && !error) {
+      toast.success('Signed in!');
+    }
+  }, [isSuccess, error]);
+
+  const disabled = !form.formState.isValid || form.formState.isSubmitting || isLoading;
 
   return (
     <Form {...form}>
