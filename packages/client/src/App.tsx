@@ -19,7 +19,7 @@ import { ErrorBoundary, ProtectedRoute, SafeErrorFallback } from './components';
 import { BoundaryByRoute } from '@/layouts/BoundaryByRoute';
 import { SignInPage } from './pages/SignIn';
 import { SignUpPage } from './pages/SignUp';
-import { Leaderboard } from '@/pages/Leaderboard';
+import { Leaderboard } from './pages/Leaderboard';
 import { AuthProvider } from '@/providers';
 
 function App() {
