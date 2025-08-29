@@ -1,52 +1,124 @@
+import { useCallback } from 'react';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/providers';
+import { Button } from '@/components/ui/button';
 import {
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenu,
-  NavigationMenuList,
-} from '@/components/ui/navigation-menu';
-import { NavLink, Outlet } from 'react-router-dom';
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Trophy, MessageSquare, UserRound } from 'lucide-react';
 
-const links = [
-  { to: '/sign-up', label: 'Sign Up' },
-  { to: '/sign-in', label: 'Sign In' },
-  { to: '/profile', label: 'Profile' },
-  { to: '/', label: 'Home' },
-  { to: '/game', label: 'Game' },
-  { to: '/leaderboard', label: 'Leaderboard' },
-  { to: '/forum', label: 'Forum' },
-  { to: '/error/400', label: '400' },
-  { to: '/error/500', label: '500' },
-];
+function IconNavLink({
+  to,
+  label,
+  children,
+}: {
+  to: string
+  label: string
+  children: React.ReactNode
+}) {
+  return (
+    <NavLink
+      to={to}
+      className={({ isActive }) =>
+        [
+          "inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+          "hover:text-primary",
+          isActive ? "text-primary" : "text-muted-foreground",
+        ].join(" ")
+      }
+    >
+      {children}
+      {label}
+    </NavLink>
+  )
+}
+
+function ProfileDropdown() {
+  const { logout } = useAuth();
+  const navigate = useNavigate()
+
+  const handleLogout = useCallback(() => {
+    logout();
+    navigate("/sign-in")
+  }, [navigate])
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-9 w-9 rounded-full p-0 hover:text-primary"
+        >
+          <Avatar className="h-9 w-9">
+            <AvatarImage src="/me.png" alt="Profile" />
+            <AvatarFallback>
+              <UserRound size={18} />
+            </AvatarFallback>
+          </Avatar>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>Account</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <NavLink to="/profile">Profile</NavLink>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          className="text-red-600 focus:text-red-600"
+          onSelect={(e) => {
+            e.preventDefault()
+            handleLogout()
+          }}
+        >
+          Logout
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
 
 export default function MainLayout() {
   return (
-    <div className='flex flex-col min-h-screen'>
-      <header className='border-b px-6 py-4'>
-        <NavigationMenu>
-          <NavigationMenuList className='flex gap-4'>
-            {links.map(({ to, label }) => (
-              <NavigationMenuItem key={to}>
-                <NavigationMenuLink asChild>
-                  <NavLink
-                    to={to}
-                    className={({ isActive }) =>
-                      `transition-colors hover:text-primary ${
-                        isActive ? 'text-primary font-semibold' : 'text-muted-foreground'
-                      }`
-                    }
-                  >
-                    {label}
-                  </NavLink>
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-            ))}
-          </NavigationMenuList>
-        </NavigationMenu>
+    <div className="flex min-h-screen flex-col">
+      <header className="border-b px-6 py-3">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <NavLink
+              to="/"
+              className="text-xl font-extrabold leading-none tracking-tight"
+            >
+              2048
+            </NavLink>
+
+            <nav className="flex items-center gap-2 pl-4">
+              <IconNavLink to="/leaderboard" label="Leaderboard">
+                <Trophy size={18} />
+              </IconNavLink>
+              <IconNavLink to="/forum" label="Forum">
+                <MessageSquare size={18} />
+              </IconNavLink>
+            </nav>
+          </div>
+
+          <ProfileDropdown />
+        </div>
       </header>
-      <main className='flex-1 p-6 flex justify-center'>
+
+      <main className="flex flex-1 justify-center p-6">
         <Outlet />
       </main>
-      <footer className='border-t px-6 py-4 text-center text-sm text-muted-foreground'>© 2025 undefined team</footer>
+
+      <footer className="border-t px-6 py-4 text-center text-sm text-muted-foreground">
+        © 2025 undefined team
+      </footer>
     </div>
-  );
+  )
 }

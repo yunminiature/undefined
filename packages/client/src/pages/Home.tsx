@@ -9,21 +9,8 @@ import { Button } from '@/components/ui/button';
 import { Gamepad2 } from 'lucide-react';
 
 export default function Home() {
-  const { data, isSuccess, error } = useGetGreetingQuery();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (isSuccess && data) {
-      toast.success(data);
-    }
-  }, [isSuccess, data]);
-
-  useEffect(() => {
-    if (error) {
-      toast.error('Error fetching data from the server');
-    }
-  }, [error]);
 
   const handleStartPlaying = () => {
     if (isAuthenticated) {
