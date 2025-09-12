@@ -1,5 +1,6 @@
 const path = require('path');
 const nodeExternals = require('webpack-node-externals');
+const webpack = require('webpack');
 
 module.exports = {
   mode: 'development',
@@ -10,7 +11,11 @@ module.exports = {
     filename: 'server.js',
     clean: true,
   },
-  externals: [nodeExternals()],
+  externals: [
+    nodeExternals({
+      allowlist: [/^react-router-dom\/server(\/.*)?$/],
+    }),
+  ],
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
     alias: {
@@ -24,8 +29,9 @@ module.exports = {
         use: {
           loader: 'ts-loader',
           options: {
-            configFile: 'tsconfig.server.json'
-          }
+            configFile: 'tsconfig.server.json',
+            transpileOnly: true,
+          },
         },
         exclude: /node_modules/,
       },
@@ -48,9 +54,14 @@ module.exports = {
         use: ['ignore-loader'],
       },
       {
-        test: /\.(png|jpe?g|gif|svg|woff|woff2|ttf|eot)$/,
+        test: /(\.png|jpe?g|gif|svg|woff2?|ttf|eot)$/,
         use: ['ignore-loader'],
       },
     ],
   },
+  plugins: [
+    new webpack.DefinePlugin({
+      __SERVER_PORT__: JSON.stringify(process.env.SERVER_PORT || 3001),
+    }),
+  ],
 };
