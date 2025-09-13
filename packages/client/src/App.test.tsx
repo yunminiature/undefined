@@ -1,9 +1,12 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import React from 'react'
 import { render, screen, cleanup } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
+import { Provider } from 'react-redux'
+import { createAppStore } from './store'
 import { Outlet } from 'react-router-dom'
 
-// ---- mock redux store ----
+// ---- mock redux store factory ----
 jest.mock('./store', () => {
   const store = {
     getState: jest.fn(() => ({})),
@@ -11,7 +14,7 @@ jest.mock('./store', () => {
     subscribe: jest.fn(() => jest.fn()),
     replaceReducer: jest.fn(),
   }
-  return { store }
+  return { createAppStore: () => store }
 })
 
 // ---- mock layouts that host <Outlet/> ----
@@ -60,7 +63,7 @@ jest.mock('./components/ui/sonner', () => ({
 // ---- mock pages ----
 jest.mock('./pages/Home', () => ({ __esModule: true, default: () => <div>HomePage</div> }))
 jest.mock('./pages/Game', () => ({ __esModule: true, default: () => <div>GamePage</div> }))
-jest.mock('./pages/Leaderboard', () => ({ __esModule: true, default: () => <div>LeaderboardPage</div> }))
+jest.mock('./pages/Leaderboard', () => ({ __esModule: true, Leaderboard: () => <div>LeaderboardPage</div> }))
 jest.mock('./pages/Forum/Forum', () => ({ __esModule: true, default: () => <div>ForumPage</div> }))
 jest.mock('./pages/Forum/ForumTopic', () => ({ __esModule: true, default: () => <div>ForumTopicPage</div> }))
 jest.mock('./pages/NotFound', () => ({ __esModule: true, default: () => <div>NotFoundPage</div> }))
@@ -81,34 +84,39 @@ describe('App routing (primitive)', () => {
     window.history.pushState({}, '', '/')
   })
 
-  it('renders Home on "/" route', () => {
+  const renderWithProviders = (route: string) => {
     const App = require('./App').default
-    render(<App />)
+    const store = createAppStore()
+    return render(
+      <Provider store={store}>
+        <MemoryRouter initialEntries={[route]}>
+          <App />
+        </MemoryRouter>
+      </Provider>
+    )
+  }
+
+  it('renders Home on "/" route', () => {
+    renderWithProviders('/')
     expect(screen.getByText('HomePage')).toBeInTheDocument()
     expect(screen.getByTestId('main-layout')).toBeInTheDocument()
     expect(screen.getByTestId('toaster')).toBeInTheDocument()
   })
 
   it('renders ForumTopic on "/forum/topic/:id"', () => {
-    const App = require('./App').default
-    window.history.pushState({}, '', '/forum/topic/42')
-    render(<App />)
+    renderWithProviders('/forum/topic/42')
     expect(screen.getByText('ForumTopicPage')).toBeInTheDocument()
     expect(screen.getByTestId('main-layout')).toBeInTheDocument()
   })
 
   it('renders SignIn inside AuthLayout on "/sign-in"', () => {
-    const App = require('./App').default
-    window.history.pushState({}, '', '/sign-in')
-    render(<App />)
+    renderWithProviders('/sign-in')
     expect(screen.getByText('SignInPage')).toBeInTheDocument()
     expect(screen.getByTestId('auth-layout')).toBeInTheDocument()
   })
 
   it('renders NotFound on unknown route', () => {
-    const App = require('./App').default
-    window.history.pushState({}, '', '/unknown')
-    render(<App />)
+    renderWithProviders('/unknown')
     expect(screen.getByText('NotFoundPage')).toBeInTheDocument()
   })
 })

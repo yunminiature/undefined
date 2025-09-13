@@ -1,15 +1,36 @@
 import express from 'express';
 import path from 'path';
-import React from 'react';
+import fs from 'fs';
 import ReactDOMServer from 'react-dom/server';
+import { Provider } from 'react-redux';
+import serialize from 'serialize-javascript';
 import ServerApp from './components/ServerApp';
+import { createAppStore } from '../../client/src/store';
 
 const app = express();
 const port = process.env.PORT || 3000;
 
+const clientDistPath = path.join(__dirname, '../../client/dist');
+
 // Serve static files from client build
-app.use('/static', express.static(path.join(__dirname, '../../client/dist')));
-app.use('/assets', express.static(path.join(__dirname, '../../client/dist/assets')));
+app.use('/static', express.static(clientDistPath));
+app.use('/assets', express.static(path.join(clientDistPath, 'assets')));
+// Serve root-level assets like /preview.png, but do not serve index.html
+app.use(express.static(clientDistPath, { index: false }));
+
+// Resolve built asset filenames from Vite manifest
+const manifestPath = path.join(clientDistPath, 'manifest.json');
+let clientJs = '/assets/index.js';
+let clientCss: string | null = null;
+try {
+  const manifestRaw = fs.readFileSync(manifestPath, 'utf-8');
+  const manifest = JSON.parse(manifestRaw);
+  if (manifest['index.html']?.file) clientJs = `/${manifest['index.html'].file}`;
+  const css = manifest['index.html']?.css?.[0];
+  if (css) clientCss = `/${css}`;
+} catch (e) {
+  console.warn('⚠️  Could not read Vite manifest. Falling back to default asset names.', e);
+}
 
 // HTML template function
 const createHTMLTemplate = (reactHtml: string, preloadedState: Record<string, unknown> = {}) => `
@@ -19,8 +40,7 @@ const createHTMLTemplate = (reactHtml: string, preloadedState: Record<string, un
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>React SSR Application</title>
-    <link rel="stylesheet" href="/static/index.css">
-    <link rel="stylesheet" href="/assets/index.css">
+    ${clientCss ? `<link rel="stylesheet" href="${clientCss}">` : ''}
     <style>
       /* Критические стили для предотвращения FOUC */
       body {
@@ -40,10 +60,9 @@ const createHTMLTemplate = (reactHtml: string, preloadedState: Record<string, un
     <div id="root">${reactHtml}</div>
     <script>
       // Передача состояния Redux на клиент
-      window.__PRELOADED_STATE__ = ${JSON.stringify(preloadedState).replace(/</g, '\\u003c')};
+      window.__PRELOADED_STATE__ = ${serialize(preloadedState, { isJSON: true })};
     </script>
-    <script src="/static/index.js"></script>
-    <script src="/assets/index.js"></script>
+    <script src="${clientJs}" type="module"></script>
   </body>
 </html>
 `;
@@ -53,16 +72,19 @@ const renderReactApp = (req: express.Request, res: express.Response) => {
   try {
     console.log(`🔍 SSR рендер для маршрута: ${req.url}`);
 
-    // Рендерим серверное приложение
-    const reactApp = <ServerApp url={req.url} />;
+    // Создаем стор на сервере и при необходимости диспатчим prefetch экшены
+    const store = createAppStore();
+
+    // Рендерим серверное приложение с маршрутизатором и провайдером стора
+    const reactApp = (
+      <Provider store={store}>
+        <ServerApp url={req.url} />
+      </Provider>
+    );
 
     const appString = ReactDOMServer.renderToString(reactApp);
 
-    // Базовое состояние для клиентского приложения
-    const preloadedState = {
-      auth: { isAuthenticated: false, user: null },
-      forum: { topics: [], currentTopic: null },
-    };
+    const preloadedState = store.getState() as unknown as Record<string, unknown>;
 
     const html = createHTMLTemplate(appString, preloadedState);
 
@@ -81,7 +103,7 @@ const renderReactApp = (req: express.Request, res: express.Response) => {
 };
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
+app.get('/api/health', (_req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
@@ -102,7 +124,7 @@ app.use((err: Error, _req: express.Request, res: express.Response) => {
 
 app.listen(port, () => {
   console.log(`🚀 SSR Server запущен на порту ${port}`);
-  console.log(`📂 Статические файлы обслуживаются из: ${path.join(__dirname, '../../client/dist')}`);
+  console.log(`📂 Статические файлы обслуживаются из: ${clientDistPath}`);
 });
 
 export default app;

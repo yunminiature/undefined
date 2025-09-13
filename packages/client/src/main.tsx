@@ -1,7 +1,8 @@
 import React from 'react';
 import { hydrateRoot, createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
-import { store } from './store';
+import { BrowserRouter } from 'react-router-dom';
+import { createAppStore } from './store';
 import App from './App';
 import './index.css';
 
@@ -23,10 +24,15 @@ export function startServiceWorker() {
   }
 }
 
+const preloadedState = typeof window !== 'undefined' ? window.__PRELOADED_STATE__ : undefined;
+const store = createAppStore(preloadedState);
+
 // Функция для создания приложения с провайдерами
 const createApp = () => (
   <Provider store={store}>
-    <App />
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
   </Provider>
 );
 
@@ -35,7 +41,7 @@ const initializeApp = () => {
   const container = document.getElementById('root') as HTMLElement;
 
   // Проверяем, есть ли предзагруженное состояние (SSR)
-  if (window.__PRELOADED_STATE__) {
+  if (preloadedState) {
     // Очищаем предзагруженное состояние
     delete window.__PRELOADED_STATE__;
 

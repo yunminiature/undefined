@@ -17,13 +17,20 @@
     "noUnusedParameters": true,
     "noUnusedLocals": true,
     "forceConsistentCasingInFileNames": true,
-    "importsNotUsedAsValues": "error",
     "lib": ["es2019", "esnext.asynciterable"],
     "types": ["node", "jest"],
     "baseUrl": ".",
     "paths": {
-      "*": ["types/*"]
+      "*": ["types/*"],
+      "@/*": ["../client/src/*"]
     },
-    "outDir": "dist"
-  }
+    "outDir": "dist",
+    "jsx": "react-jsx",
+    "noEmit": true,
+    "rootDir": ".."
+  },
+  "include": [
+    "src",
+    "../client/src"
+  ]
 }
