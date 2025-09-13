@@ -16,14 +16,31 @@ export const baseQueryWithAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBa
 ) => {
   const result = await baseQuery(args, api, extraOptions);
 
-  if (result.error && 'status' in result.error) {
-    if (result.error.status === 401) {
-      api.dispatch(clearUser());
-      toast.error('The session has expired. Please log in again.');
-    } else if (result.error.status === 403) {
-      toast.error('Access is denied');
-    } else if (result.error.status >= 500) {
-      toast.error('Server error');
+  const err = result.error;
+  if (err && 'status' in err) {
+    const { status } = err;
+
+    if (typeof status === 'number') {
+      if (status === 401) {
+        api.dispatch(clearUser());
+        toast.error('Your session has expired. Please sign in again.');
+      } else if (status === 403) {
+        toast.error('Access denied.');
+      } else if (status >= 500) {
+        toast.error('Server error.');
+      }
+    } else {
+      switch (status) {
+        case 'FETCH_ERROR':
+          toast.error('Network error or server unreachable.');
+          break;
+        case 'PARSING_ERROR':
+          toast.error('Response parsing error.');
+          break;
+        case 'CUSTOM_ERROR':
+          toast.error('Request failed with a custom error.');
+          break;
+      }
     }
   }
 

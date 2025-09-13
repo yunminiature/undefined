@@ -12,3 +12,5 @@ export * from './Forum/TopicDetail';
 export * from './Forum/CreateTopicForm';
 export * from './Forum/CommentForm';
 export * from './ProtectedRoute';
+export * from './SectionHr';
+export * from './SignInWithYandexButton';
