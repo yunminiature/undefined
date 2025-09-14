@@ -1,17 +1,22 @@
 import { toast } from 'sonner';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 
 import { useGameBoard } from '@/hooks/use-game-board';
+import { useAudio } from '@/audio';
 
 import { GameWelcome } from './GameWelcome';
 import { GamePlay } from './GamePlay';
 import { GameHeader } from './GameHeader';
 import { GameActions } from './GameActions';
 import { GameStatus } from './types';
+import { useGameAudio } from '@/hooks/useGameAudio';
 
 export const GameContainer = () => {
   const { gameState, reset, animationData, clearAnimationData } = useGameBoard();
   const [isGameStarted, setIsGameStarted] = useState(false);
+  const { playSound } = useAudio();
+
+  useGameAudio(animationData);
 
   const gameStatus = useMemo((): GameStatus => {
     if (!isGameStarted) {
@@ -25,6 +30,14 @@ export const GameContainer = () => {
     }
     return 'playing';
   }, [isGameStarted, gameState.isWon, gameState.isGameOver]);
+
+  useEffect(() => {
+    if (gameState.isWon) {
+      playSound('win');
+    } else if (gameState.isGameOver) {
+      playSound('lose');
+    }
+  }, [gameState.isWon, gameState.isGameOver, playSound]);
 
   const handlePlayAgain = () => {
     try {
