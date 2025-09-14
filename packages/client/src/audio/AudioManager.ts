@@ -55,7 +55,7 @@ export class AudioManager {
     oscillator.frequency.exponentialRampToValueAtTime(400, this.audioContext.currentTime + duration);
 
     gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
-    gainNode.gain.linearRampToValueAtTime(0.2, this.audioContext.currentTime + 0.005);
+    gainNode.gain.linearRampToValueAtTime(0.6 * this.config.volume, this.audioContext.currentTime + 0.005);
     gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + duration);
 
     oscillator.start(this.audioContext.currentTime);
@@ -78,7 +78,7 @@ export class AudioManager {
     oscillator.frequency.linearRampToValueAtTime(100, this.audioContext.currentTime + duration);
 
     gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
-    gainNode.gain.linearRampToValueAtTime(0.15, this.audioContext.currentTime + 0.01);
+    gainNode.gain.linearRampToValueAtTime(0.65 * this.config.volume, this.audioContext.currentTime + 0.01);
     gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + duration);
 
     oscillator.start(this.audioContext.currentTime);
@@ -100,7 +100,7 @@ export class AudioManager {
     oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
 
     gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
-    gainNode.gain.linearRampToValueAtTime(0.25, this.audioContext.currentTime + 0.01);
+    gainNode.gain.linearRampToValueAtTime(0.75 * this.config.volume, this.audioContext.currentTime + 0.01);
     gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + duration);
 
     oscillator.start(this.audioContext.currentTime);
@@ -141,7 +141,7 @@ export class AudioManager {
       oscillator.type = note.type;
 
       gainNode.gain.setValueAtTime(0, currentTime);
-      gainNode.gain.linearRampToValueAtTime(0.35, currentTime + 0.01);
+      gainNode.gain.linearRampToValueAtTime(0.7 * this.config.volume, currentTime + 0.01);
       gainNode.gain.exponentialRampToValueAtTime(0.001, currentTime + note.duration);
 
       oscillator.start(currentTime);
@@ -186,7 +186,7 @@ export class AudioManager {
       oscillator.type = note.type;
 
       gainNode.gain.setValueAtTime(0, currentTime);
-      gainNode.gain.linearRampToValueAtTime(0.15, currentTime + 0.05);
+      gainNode.gain.linearRampToValueAtTime(0.3 * this.config.volume, currentTime + 0.05);
       gainNode.gain.exponentialRampToValueAtTime(0.001, currentTime + note.duration);
 
       oscillator.start(currentTime);
@@ -220,7 +220,7 @@ export class AudioManager {
         oscillator.type = 'triangle';
 
         gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-        gainNode.gain.linearRampToValueAtTime(0.2, audioContext.currentTime + 0.01);
+        gainNode.gain.linearRampToValueAtTime(0.2 * this.config.volume, audioContext.currentTime + 0.01);
         gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.12);
 
         oscillator.start(audioContext.currentTime);
@@ -251,7 +251,7 @@ export class AudioManager {
         oscillator.type = 'square';
 
         gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-        gainNode.gain.linearRampToValueAtTime(0.25, audioContext.currentTime + 0.005);
+        gainNode.gain.linearRampToValueAtTime(0.25 * this.config.volume, audioContext.currentTime + 0.005);
         gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.08);
 
         oscillator.start(audioContext.currentTime);

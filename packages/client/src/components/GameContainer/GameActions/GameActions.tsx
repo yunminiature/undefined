@@ -1,4 +1,4 @@
-import { RefreshCcw, RotateCcw, ArrowLeft } from 'lucide-react';
+import { RefreshCcw, RotateCcw, ArrowLeft, Volume, Volume2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 import shared from '../shared.module.css';
@@ -7,12 +7,21 @@ import { FullscreenButton } from '../FullscreenButton';
 
 interface GameActionsProps {
   gameStatus: GameStatus;
+  isAudioEnabled: boolean;
   onReset: () => void;
   onPlayAgain: () => void;
   onBackToMenu: () => void;
+  onToggleAudio: () => void;
 }
 
-export const GameActions = ({ gameStatus, onReset, onPlayAgain, onBackToMenu }: GameActionsProps) => {
+export const GameActions = ({
+  gameStatus,
+  isAudioEnabled,
+  onReset,
+  onPlayAgain,
+  onBackToMenu,
+  onToggleAudio,
+}: GameActionsProps) => {
   const backToMenuButton = (
     <Button onClick={onBackToMenu} variant='outline'>
       <ArrowLeft /> Back to Menu
@@ -33,7 +42,12 @@ export const GameActions = ({ gameStatus, onReset, onPlayAgain, onBackToMenu }: 
         )}
         {backToMenuButton}
       </div>
-      <FullscreenButton variant='outline' size='sm' />
+      <div className={`${shared.gameBlock} flex gap-4 justify-center`}>
+        <FullscreenButton variant='outline' size='sm' />
+        <Button size='sm' onClick={onToggleAudio}>
+          {isAudioEnabled ? <Volume2 /> : <Volume />} Audio
+        </Button>
+      </div>
     </div>
   );
 };

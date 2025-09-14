@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { TileMovement } from '@/utils/game';
 import { useAudio } from '@/audio';
+import { GameState } from '@/types/game';
 
 type AnimationData = {
   board: number[][];
@@ -8,15 +9,13 @@ type AnimationData = {
   newTile?: { x: number; y: number; value: number };
 };
 
-export function useGameAudio(animationData: AnimationData | null) {
-  const { playSound } = useAudio();
+export function useGameAudio(gameState: GameState, animationData: AnimationData | null) {
+  const { playSound, config, toggleEnabled } = useAudio();
 
   useEffect(() => {
-    if (!animationData) {
+    if (!animationData || !config.enabled) {
       return;
     }
-
-    console.log('useGameAudio', animationData);
 
     const { movements, newTile } = animationData;
 
@@ -48,4 +47,22 @@ export function useGameAudio(animationData: AnimationData | null) {
       playSound('newTile');
     }
   }, [animationData, playSound]);
+
+  useEffect(() => {
+    if (!gameState || !config.enabled) {
+      return;
+    }
+
+    if (gameState.isWon) {
+      playSound('win');
+    } else if (gameState.isGameOver) {
+      playSound('lose');
+    }
+  }, [gameState.isWon, gameState.isGameOver, playSound, config.enabled]);
+
+  return {
+    playSound,
+    config,
+    toggleEnabled,
+  };
 }

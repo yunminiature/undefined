@@ -2,7 +2,6 @@ import { toast } from 'sonner';
 import { useState, useMemo, useEffect } from 'react';
 
 import { useGameBoard } from '@/hooks/use-game-board';
-import { useAudio } from '@/audio';
 
 import { GameWelcome } from './GameWelcome';
 import { GamePlay } from './GamePlay';
@@ -14,9 +13,7 @@ import { useGameAudio } from '@/hooks/useGameAudio';
 export const GameContainer = () => {
   const { gameState, reset, animationData, clearAnimationData } = useGameBoard();
   const [isGameStarted, setIsGameStarted] = useState(false);
-  const { playSound } = useAudio();
-
-  useGameAudio(animationData);
+  const { config, toggleEnabled } = useGameAudio(gameState, animationData);
 
   const gameStatus = useMemo((): GameStatus => {
     if (!isGameStarted) {
@@ -30,14 +27,6 @@ export const GameContainer = () => {
     }
     return 'playing';
   }, [isGameStarted, gameState.isWon, gameState.isGameOver]);
-
-  useEffect(() => {
-    if (gameState.isWon) {
-      playSound('win');
-    } else if (gameState.isGameOver) {
-      playSound('lose');
-    }
-  }, [gameState.isWon, gameState.isGameOver, playSound]);
 
   const handlePlayAgain = () => {
     try {
@@ -67,9 +56,11 @@ export const GameContainer = () => {
           <GamePlay board={gameState.board} animationData={animationData} onAnimationComplete={clearAnimationData} />
           <GameActions
             gameStatus={gameStatus}
+            isAudioEnabled={config.enabled}
             onReset={reset}
             onPlayAgain={handlePlayAgain}
             onBackToMenu={handleBackToMenu}
+            onToggleAudio={toggleEnabled}
           />
         </>
       )}

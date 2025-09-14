@@ -5,7 +5,7 @@ import { AudioConfig, SoundType } from './types';
 
 export function useAudio() {
   const audioManagerRef = useRef<AudioManager | null>(null);
-  const [config] = useState<AudioConfig>({
+  const [config, setConfig] = useState<AudioConfig>({
     volume: 0.5,
     enabled: true,
   });
@@ -42,8 +42,13 @@ export function useAudio() {
     }
   }, []);
 
+  const toggleEnabled = useCallback(() => {
+    setConfig((prev) => ({ ...prev, enabled: !prev.enabled }));
+  }, []);
+
   return {
     playSound,
     config,
+    toggleEnabled,
   };
 }
