@@ -9,7 +9,7 @@ type AnimationData = {
   newTile?: { x: number; y: number; value: number };
 };
 
-export function useGameBoard() {
+export function useGameBoard(isGameStarted = true) {
   const [gameState, setGameState] = useState<GameState>(() => getInitialGameState());
   const [animationData, setAnimationData] = useState<AnimationData | null>(null);
 
@@ -63,9 +63,13 @@ export function useGameBoard() {
   }, []);
 
   useEffect(() => {
+    if (!isGameStarted) {
+      return;
+    }
+
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [handleKey]);
+  }, [handleKey, isGameStarted]);
 
   return { gameState, reset, animationData, clearAnimationData };
 }

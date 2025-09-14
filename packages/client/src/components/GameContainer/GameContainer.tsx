@@ -1,18 +1,18 @@
 import { toast } from 'sonner';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 
 import { useGameBoard } from '@/hooks/use-game-board';
+import { useGameAudio } from '@/hooks/useGameAudio';
 
 import { GameWelcome } from './GameWelcome';
 import { GamePlay } from './GamePlay';
 import { GameHeader } from './GameHeader';
 import { GameActions } from './GameActions';
 import { GameStatus } from './types';
-import { useGameAudio } from '@/hooks/useGameAudio';
 
 export const GameContainer = () => {
-  const { gameState, reset, animationData, clearAnimationData } = useGameBoard();
   const [isGameStarted, setIsGameStarted] = useState(false);
+  const { gameState, reset, animationData, clearAnimationData } = useGameBoard(isGameStarted);
   const { config, toggleEnabled } = useGameAudio(gameState, animationData);
 
   const gameStatus = useMemo((): GameStatus => {
