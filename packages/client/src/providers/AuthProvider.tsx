@@ -1,16 +1,26 @@
-import React, { useEffect, FC, PropsWithChildren } from 'react';
+import { useEffect, FC, PropsWithChildren } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useGetUserInfoQuery, useLogoutMutation } from '@/api/auth';
 import { setUser, clearUser, selectIsAuthenticated, selectUser } from '@/store/authSlice';
 import { toast } from 'sonner';
 import { AuthContext } from './AuthContext';
+import { useOAuth } from '@/hooks/useOAuth';
 
 export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const isAuthenticated = useSelector(selectIsAuthenticated);
 
-  const { data: userInfo, isLoading, refetch, isSuccess } = useGetUserInfoQuery();
+  const { code, isExchanging } = useOAuth(isAuthenticated);
+
+  const {
+    data: userInfo,
+    isLoading: isUserLoading,
+    refetch,
+    isSuccess,
+  } = useGetUserInfoQuery(undefined, {
+    skip: !!code || isExchanging,
+  });
 
   const [logoutQuery] = useLogoutMutation();
 
@@ -45,7 +55,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
       value={{
         user,
         isAuthenticated,
-        isLoading,
+        isLoading: isUserLoading || isExchanging,
         logout,
         refreshUserInfo,
       }}

@@ -1,10 +1,6 @@
-import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { toast } from 'sonner';
 import { useAuth } from '@/providers';
 import { useNavigate } from 'react-router-dom';
 
-import { useGetGreetingQuery } from '@/api/server';
 import { Button } from '@/components/ui/button';
 import { Gamepad2 } from 'lucide-react';
 
