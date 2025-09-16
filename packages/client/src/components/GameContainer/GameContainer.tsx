@@ -2,6 +2,7 @@ import { toast } from 'sonner';
 import { useState, useMemo } from 'react';
 
 import { useGameBoard } from '@/hooks/use-game-board';
+import { useGameAudio } from '@/hooks/useGameAudio';
 
 import { GameWelcome } from './GameWelcome';
 import { GamePlay } from './GamePlay';
@@ -10,8 +11,9 @@ import { GameActions } from './GameActions';
 import { GameStatus } from './types';
 
 export const GameContainer = () => {
-  const { gameState, reset, animationData, clearAnimationData } = useGameBoard();
   const [isGameStarted, setIsGameStarted] = useState(false);
+  const { gameState, reset, animationData, clearAnimationData } = useGameBoard(isGameStarted);
+  const { config, toggleEnabled } = useGameAudio(gameState, animationData);
 
   const gameStatus = useMemo((): GameStatus => {
     if (!isGameStarted) {
@@ -54,9 +56,11 @@ export const GameContainer = () => {
           <GamePlay board={gameState.board} animationData={animationData} onAnimationComplete={clearAnimationData} />
           <GameActions
             gameStatus={gameStatus}
+            isAudioEnabled={config.enabled}
             onReset={reset}
             onPlayAgain={handlePlayAgain}
             onBackToMenu={handleBackToMenu}
+            onToggleAudio={toggleEnabled}
           />
         </>
       )}
