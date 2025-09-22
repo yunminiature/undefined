@@ -6,6 +6,7 @@ import { Provider } from 'react-redux';
 import serialize from 'serialize-javascript';
 import ServerApp from './components/ServerApp';
 import { createAppStore } from '../../client/src/store';
+import { authMiddleware } from './middleware/authMiddleware';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -17,6 +18,23 @@ app.use('/static', express.static(clientDistPath));
 app.use('/assets', express.static(path.join(clientDistPath, 'assets')));
 // Serve root-level assets like /preview.png, but do not serve index.html
 app.use(express.static(clientDistPath, { index: false }));
+
+const apiRouter = express.Router();
+
+apiRouter.use(authMiddleware);
+
+// Health check endpoint (requires auth)
+apiRouter.get('/health', (_req, res) => {
+  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+});
+
+// API routes placeholder
+apiRouter.use((_req, res) => {
+  // Здесь можно добавить API роуты
+  res.status(404).json({ error: 'API endpoint not found' });
+});
+
+app.use('/api', apiRouter);
 
 // Resolve built asset filenames from Vite manifest
 const manifestPath = path.join(clientDistPath, 'manifest.json');
@@ -101,17 +119,6 @@ const renderReactApp = (req: express.Request, res: express.Response) => {
     res.status(500).send(fallbackHtml);
   }
 };
-
-// Health check endpoint
-app.get('/api/health', (_req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
-});
-
-// API routes placeholder
-app.use('/api', (_req, res) => {
-  // Здесь можно добавить API роуты
-  res.status(404).json({ error: 'API endpoint not found' });
-});
 
 // SSR для всех остальных маршрутов
 app.get('*', renderReactApp);
