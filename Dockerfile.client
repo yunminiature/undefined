@@ -1,22 +1,23 @@
-ARG NODE_VERSION=16
+ARG NODE_VERSION=20
 ARG CLIENT_PORT=3001
 
-FROM node:$NODE_VERSION-buster as base
+FROM node:$NODE_VERSION-buster AS base
 
 WORKDIR /app
 
-FROM base as builder
+# Enable Corepack to use the correct Yarn version
+RUN corepack enable
+
+FROM base AS builder
 
 COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
+RUN yarn install --mode=skip-build
 
 COPY . .
+RUN yarn install --mode=skip-build
+RUN rm -rf /app/packages/client/dist/ && NODE_ENV=production yarn build --scope=client
 
-RUN yarn lerna bootstrap
-RUN rm -rf /app/packages/client/dist/ && yarn build --scope=client
-
-
-FROM nginx:latest as production
+FROM nginx:latest AS production
 WORKDIR /app
 
 COPY --from=builder /app/packages/client/dist/ /app/
