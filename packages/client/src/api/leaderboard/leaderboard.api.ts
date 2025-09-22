@@ -1,120 +1,97 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
 import type {
   TopScoresResponse,
-  LeaderboardResponse,
   LeaderboardQuery,
   PaginatedLeaderboardResponse,
+  LeaderboardAllRequest,
+  LeaderboardAllResponse,
+  LeaderboardAddRequest,
 } from './leaderboard.dto';
 import { baseQueryWithAuth } from '@/api/baseQuery';
 
-const mockTopScores: TopScoresResponse = [
-  { score: 15420, scoreDescription: 'Highest Score' },
-  { score: 12350, scoreDescription: 'This Week' },
-  { score: 8930, scoreDescription: 'This Month' },
-];
-
-const generateMockLeaderboard = (): LeaderboardResponse => {
-  const firstNames = [
-    'Alice',
-    'Bob',
-    'Charlie',
-    'Diana',
-    'Ethan',
-    'Fiona',
-    'George',
-    'Helen',
-    'Ivan',
-    'Julia',
-    'Kevin',
-    'Luna',
-    'Mike',
-    'Nina',
-    'Oscar',
-    'Paula',
-    'Quinn',
-    'Rachel',
-    'Steve',
-    'Tina',
-  ];
-  const lastNames = [
-    'Johnson',
-    'Smith',
-    'Brown',
-    'Prince',
-    'Hunt',
-    'Green',
-    'Miller',
-    'Troy',
-    'Petrov',
-    'Roberts',
-    'Wilson',
-    'Davis',
-    'Garcia',
-    'Martinez',
-    'Anderson',
-    'Taylor',
-    'Thomas',
-    'Hernandez',
-    'Moore',
-    'Martin',
-  ];
-
-  const players = [];
-  for (let i = 1; i <= 100; i++) {
-    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-    const name = `${firstName} ${lastName} ${i}`;
-    const score = Math.max(1000, 16000 - i * 150 + Math.floor(Math.random() * 200));
-
-    players.push({
-      id: i.toString(),
-      name,
-      score,
-      rank: i,
-      avatar: undefined,
-    });
-  }
-  return players;
-};
-
-const mockLeaderboard = generateMockLeaderboard();
+const TEAM_NAME = 'undefined';
+const RATING_FIELD = 'undefinedScore';
 
 export const leaderboardApi = createApi({
   reducerPath: 'leaderboardApi',
   baseQuery: baseQueryWithAuth,
   endpoints: (builder) => ({
-    getTopScores: builder.query<TopScoresResponse, void>({
-      queryFn: async () => {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        return { data: mockTopScores };
+    getTopScores: builder.mutation<TopScoresResponse, void>({
+      query: () => ({
+        url: `/leaderboard/${TEAM_NAME}`,
+        method: 'POST',
+        body: {
+          ratingFieldName: RATING_FIELD,
+          cursor: 0,
+          limit: 3,
+        },
+      }),
+      transformResponse: (response: LeaderboardAllResponse) => {
+        const sorted = [...response]
+          .map((item) => ({ score: Number(item.data.undefinedScore ?? 0) }))
+          .sort((a, b) => b.score - a.score)
+          .slice(0, 3);
+        return sorted.map((s, idx) => ({
+          score: s.score,
+          scoreDescription: idx === 0 ? 'Highest Score' : `Top ${idx + 1}`,
+        }));
       },
     }),
-    getLeaderboard: builder.query<PaginatedLeaderboardResponse, LeaderboardQuery>({
-      queryFn: async ({ page = 1, limit = 10, search = '' }) => {
-        await new Promise((resolve) => setTimeout(resolve, 800));
 
-        let filteredData = mockLeaderboard;
-        if (search.trim()) {
-          filteredData = mockLeaderboard.filter((player) => player.name.toLowerCase().includes(search.toLowerCase()));
-        }
+    getLeaderboard: builder.mutation<PaginatedLeaderboardResponse, LeaderboardQuery>({
+      query: ({ page = 1, limit = 10 } = {}) => ({
+        url: `/leaderboard/${TEAM_NAME}`,
+        method: 'POST',
+        body: {
+          ratingFieldName: RATING_FIELD,
+          cursor: (page - 1) * limit,
+          limit,
+        } as LeaderboardAllRequest,
+      }),
+      transformResponse: (response: LeaderboardAllResponse, _meta, arg) => {
+        const page = arg?.page ?? 1;
+        const limit = arg?.limit ?? 10;
+        const search = (arg?.search ?? '').trim().toLowerCase();
+        const cursor = (page - 1) * limit;
 
-        const startIndex = (page - 1) * limit;
-        const endIndex = startIndex + limit;
-        const paginatedData = filteredData.slice(startIndex, endIndex);
-        const totalPages = Math.ceil(filteredData.length / limit);
+        const mapped = response
+          .map((item, idx) => {
+            const data = item.data;
+            const score = Number(data.undefinedScore ?? 0);
+            const name = data.undefinedName || 'Anonymous';
+            const idRaw = cursor + idx + 1;
+            return { id: String(idRaw), name, score };
+          })
+          .sort((a, b) => b.score - a.score)
+          .map((item, index) => ({ ...item, rank: cursor + index + 1 }));
+
+        const filtered = search ? mapped.filter((p) => p.name.toLowerCase().includes(search)) : mapped;
+        const baseTotal = cursor + response.length;
+        const total = search ? filtered.length : baseTotal;
+        const totalPages = search ? (filtered.length > 0 ? 1 : 0) : response.length === limit ? page + 1 : page;
 
         return {
-          data: {
-            data: paginatedData,
-            total: filteredData.length,
-            page,
-            limit,
-            totalPages,
-          },
-        };
+          data: filtered,
+          total,
+          page,
+          limit,
+          totalPages,
+        } as PaginatedLeaderboardResponse;
       },
+    }),
+
+    submitScore: builder.mutation<unknown, LeaderboardAddRequest>({
+      query: ({ data }) => ({
+        url: '/leaderboard',
+        method: 'POST',
+        body: {
+          ratingFieldName: RATING_FIELD,
+          teamName: TEAM_NAME,
+          data,
+        },
+      }),
     }),
   }),
 });
 
-export const { useGetTopScoresQuery, useGetLeaderboardQuery } = leaderboardApi;
+export const { useGetTopScoresMutation, useGetLeaderboardMutation, useSubmitScoreMutation } = leaderboardApi;

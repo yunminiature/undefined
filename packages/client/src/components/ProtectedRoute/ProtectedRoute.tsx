@@ -1,5 +1,5 @@
 import React, { ReactNode, useMemo } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/providers';
 
 interface ProtectedRouteProps {
@@ -10,8 +10,9 @@ interface ProtectedRouteProps {
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, redirectTo = '/sign-in', authRoute }) => {
   const { isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
 
-  const checkCondition = useMemo(() => (authRoute ? isAuthenticated : !isAuthenticated), [authRoute, isAuthenticated]);
+  const shouldRedirect = useMemo(() => (authRoute ? isAuthenticated : !isAuthenticated), [authRoute, isAuthenticated]);
 
   if (isLoading) {
     return (
@@ -23,8 +24,14 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, redire
     );
   }
 
-  if (checkCondition) {
-    return <Navigate to={redirectTo} replace />;
+  if (shouldRedirect) {
+    if (authRoute) {
+      const from = (location.state as { from?: { pathname?: string } } | null)?.from;
+      const target = from?.pathname ?? redirectTo;
+      return <Navigate to={target} replace />;
+    }
+
+    return <Navigate to={redirectTo} replace state={{ from: location }} />;
   }
 
   return <>{children}</>;

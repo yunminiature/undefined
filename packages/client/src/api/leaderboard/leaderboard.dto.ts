@@ -8,7 +8,6 @@ export interface LeaderboardEntry {
   name: string;
   score: number;
   rank: number;
-  avatar?: string;
 }
 
 export interface LeaderboardQuery {
@@ -24,6 +23,28 @@ export interface PaginatedLeaderboardResponse {
   limit: number;
   totalPages: number;
 }
+
+export interface LeaderboardAddRequest {
+  data: LeaderboardData;
+}
+
+export interface LeaderboardAllRequest {
+  ratingFieldName: string;
+  cursor: number;
+  limit: number;
+  teamName?: string;
+}
+
+export interface LeaderboardData {
+  undefinedName: string;
+  undefinedScore: number;
+}
+
+export interface LeaderboardItem {
+  data: LeaderboardData;
+}
+
+export type LeaderboardAllResponse = LeaderboardItem[];
 
 export type TopScoresResponse = TopScore[];
 export type LeaderboardResponse = LeaderboardEntry[];
