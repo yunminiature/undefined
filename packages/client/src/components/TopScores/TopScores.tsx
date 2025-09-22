@@ -1,11 +1,15 @@
-import React, { useMemo } from 'react';
-import { useGetTopScoresQuery } from '@/api/leaderboard';
+import React, { useEffect, useMemo } from 'react';
+import { useGetTopScoresMutation } from '@/api/leaderboard';
 import ScoreBlock from './components/ScoreBlock';
 
 import s from './TopScores.module.css';
 
 const TopScores = () => {
-  const { data: scores, isLoading, error } = useGetTopScoresQuery();
+  const [getTopScores, { data: scores, isLoading, error }] = useGetTopScoresMutation();
+
+  useEffect(() => {
+    getTopScores();
+  }, [getTopScores]);
 
   const renderScores = useMemo(() => {
     if (!scores) return null;

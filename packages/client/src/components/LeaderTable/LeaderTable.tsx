@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Input } from '@/components/ui/input';
 import TablePagination from '@/components/TablePagination/TablePagination';
-import { useGetLeaderboardQuery } from '@/api/leaderboard';
+import { useGetLeaderboardMutation } from '@/api/leaderboard';
 import LeaderBlock from '@/components/LeaderTable/components/LeaderBlock';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 
@@ -13,19 +13,19 @@ const LeaderTable = () => {
   const debouncedSearch = useDebouncedValue(searchTerm, 300);
   const limit = 10;
 
+  const [getLeaderboard, { data: leaderboardData, isLoading, error }] = useGetLeaderboardMutation();
+
   useEffect(() => {
     setCurrentPage(1);
   }, [debouncedSearch]);
 
-  const {
-    data: leaderboardData,
-    isLoading,
-    error,
-  } = useGetLeaderboardQuery({
-    page: currentPage,
-    limit,
-    search: debouncedSearch,
-  });
+  useEffect(() => {
+    getLeaderboard({
+      page: currentPage,
+      limit,
+      search: debouncedSearch,
+    });
+  }, [currentPage, debouncedSearch, getLeaderboard]);
 
   const renderLeaderboard = useMemo(() => {
     if (!leaderboardData) return null;
