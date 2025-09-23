@@ -17,8 +17,11 @@ services:
     environment:
       - CLIENT_PORT=${CLIENT_PORT}
       - SERVER_PORT=${SERVER_PORT}
+    depends_on:
+      - server
     networks:
       - awesome-network
+
   server:
     container_name: prakticum-server
     image: prakticum-server
