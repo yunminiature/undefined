@@ -1,33 +1,38 @@
 ARG NODE_VERSION=20
 ARG SERVER_PORT=3001
 
+# 1. Builder stage for server
 FROM node:$NODE_VERSION-buster AS base
-
 WORKDIR /app
-
-# Enable Corepack to use the correct Yarn version
 RUN corepack enable
 
 FROM base AS builder
-
 COPY package.json yarn.lock ./
 RUN yarn install --mode=skip-build
 
 COPY . .
 RUN yarn install --mode=skip-build
+
+# Build both client and server
+RUN rm -rf /app/packages/client/dist/ && NODE_ENV=production yarn build --scope=client
 RUN rm -rf /app/packages/server/dist/ && NODE_ENV=production yarn build --scope=server
 
-
+# 3. Production stage
 FROM node:$NODE_VERSION-buster-slim AS production
 WORKDIR /app
 
-# Enable Corepack to use the correct Yarn version
 RUN corepack enable
+RUN corepack prepare yarn@4.9.2 --activate
 
+# Copy server build
 COPY --from=builder /app/packages/server/dist/ /app/
-COPY --from=builder /app/packages/client/dist/ /client/dist/
 COPY --from=builder /app/packages/server/package.json /app/package.json
-RUN yarn install --production
+
+# Copy client build
+COPY --from=builder /app/packages/client/dist/ /client/dist/
+
+# Copy node_modules from builder (includes all dependencies needed for SSR)
+COPY --from=builder /app/node_modules /app/node_modules
 
 EXPOSE $SERVER_PORT
-CMD [ "node", "/app/server.js" ]
+CMD ["node", "/app/server.js"]
