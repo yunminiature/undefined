@@ -14,6 +14,10 @@ module.exports = {
   externals: [
     nodeExternals({
       allowlist: [/^react-router-dom\/server(\/.*)?$/],
+      additionalModuleDirs: [
+        path.resolve(__dirname, '../../node_modules'),
+        path.resolve(__dirname, 'node_modules'),
+      ],
     }),
   ],
   resolve: {
