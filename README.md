@@ -60,32 +60,77 @@ packages/client
 
 ## 🚀 Запуск
 
-### Требования
+### 🐳 Docker
+
+#### Требования
+- Docker и Docker Compose
+- Файл `.env` с переменными окружения
+
+#### Быстрый старт
+```bash
+# 1. Создайте файл .env с переменными (см. .env.sample)
+# 2. Запустите все сервисы
+docker-compose up --build
+
+# 3. Откройте приложение
+# Client: http://localhost:3000
+# Server: http://localhost:3001  
+# pgAdmin: http://localhost:8080
+```
+
+#### Управление Docker
+```bash
+# Запуск в фоне
+docker-compose up -d
+
+# Остановка
+docker-compose down
+
+# Пересборка
+docker-compose up --build
+
+# Просмотр логов
+docker-compose logs -f
+```
+
+### 💻 Локальная разработка
+
+#### Требования
 - Node.js **>=18**
+- PostgreSQL
 - npm / yarn / pnpm
 
-### Установка
+#### Установка
 ```bash
 cd packages/client
 npm install
+
+cd packages/server  
+npm install
 ```
 
-### Запуск dev-сервера
+#### Запуск dev-серверов
 ```bash
+# Терминал 1: Client
+cd packages/client
+npm run dev
+
+# Терминал 2: Server
+cd packages/server
 npm run dev
 ```
 
-### Сборка
+#### Сборка
 ```bash
 npm run build
 ```
 
-### Предпросмотр production-сборки
+#### Предпросмотр production-сборки
 ```bash
 npm run preview
 ```
 
-### Тесты
+#### Тесты
 ```bash
 npm run test
 ```

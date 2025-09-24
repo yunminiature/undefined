@@ -9,9 +9,13 @@ import { createAppStore } from '../../client/src/store';
 import { authMiddleware } from './middleware/authMiddleware';
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.SERVER_PORT || 3000;
 
-const clientDistPath = path.join(__dirname, '../../client/dist');
+// Define path to client files depending on environment
+const clientDistPath =
+  process.env.NODE_ENV === 'production'
+    ? path.join('/client/dist') // In Docker container
+    : path.join(__dirname, '../../client/dist'); // Locally
 
 // Serve static files from client build
 app.use('/static', express.static(clientDistPath));

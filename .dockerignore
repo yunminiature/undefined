@@ -1,0 +1,63 @@
+# Dependencies
+node_modules/
+*/node_modules/
+packages/*/node_modules/
+
+# Build outputs
+dist/
+*/dist/
+packages/*/dist/
+build/
+*/build/
+
+# Development files
+.tmp/
+tmp/
+*.log
+*.pid
+*.seed
+*.pid.lock
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Test coverage
+coverage/
+*.lcov
+
+# Environment files
+.env*
+!.env.example
+
+# Cache
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+
+# Database
+*.sqlite
+*.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

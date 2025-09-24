@@ -15,6 +15,7 @@
 Dockerfile.client
 Dockerfile.server
 .dockerignore
+.env*
 
 /build
 node_modules
