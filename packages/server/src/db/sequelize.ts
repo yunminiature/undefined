@@ -1,12 +1,6 @@
-import { Sequelize } from 'sequelize'
+import { Sequelize } from 'sequelize';
 
-const {
-  POSTGRES_USER,
-  POSTGRES_PASSWORD,
-  POSTGRES_DB,
-  POSTGRES_HOST,
-  POSTGRES_PORT,
-} = process.env
+const { POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB, POSTGRES_HOST, POSTGRES_PORT } = process.env;
 
 export const sequelize = new Sequelize(
   POSTGRES_DB || 'postgres',
@@ -22,7 +16,7 @@ export const sequelize = new Sequelize(
       timestamps: true,
     },
   }
-)
+);
 
 export async function ensureDatabaseConnection(): Promise<void> {
   console.log('[DB] Connecting to Postgres with', {
@@ -30,21 +24,16 @@ export async function ensureDatabaseConnection(): Promise<void> {
     port: process.env.POSTGRES_PORT,
     db: process.env.POSTGRES_DB,
     user: process.env.POSTGRES_USER,
-  })
-  await sequelize.authenticate()
-  console.log('[DB] Connection successful')
+  });
+  await sequelize.authenticate();
+  console.log('[DB] Connection successful');
 }
 
 export async function syncDatabase(): Promise<void> {
-  const shouldSync = (process.env.DB_SYNC || 'true').toLowerCase() === 'true'
+  const shouldSync = (process.env.DB_SYNC || 'true').toLowerCase() === 'true';
   if (!shouldSync) {
-    console.log('[DB] Sync disabled (DB_SYNC=false)')
-    return
+    return;
   }
-  console.log('[DB] Running sequelize.sync({ alter: true }) ...')
   // Using any to satisfy our minimal ambient typings; at runtime this is valid
-  await (sequelize as any).sync({ alter: true })
-  console.log('[DB] Sync completed')
+  await (sequelize as any).sync({ alter: true });
 }
-
-

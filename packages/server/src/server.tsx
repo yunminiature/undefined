@@ -141,7 +141,6 @@ app.use((err: Error, _req: express.Request, res: express.Response) => {
 async function start() {
   try {
     await ensureDatabaseConnection();
-    console.log('✅ Sequelize connected to Postgres');
     await syncDatabase();
   } catch (e) {
     console.error('❌ Failed to connect to Postgres via Sequelize', e);
