@@ -1,7 +1,16 @@
 import type { NextFunction, Request, Response } from 'express';
+// NOTE: We import from client constants via webpack alias '@'.
+// Add defensive logs to see the resolved endpoint at runtime.
 import { AUTH_REQUIRED_COOKIES, AUTH_USER_ENDPOINT } from '@/constants/global.constants';
 
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if (!AUTH_USER_ENDPOINT) {
+      console.error('[AuthMiddleware] AUTH_USER_ENDPOINT is not defined');
+    }
+  } catch (e) {
+    console.error('[AuthMiddleware] Failed to access constants', e);
+  }
   if (req.method === 'OPTIONS') {
     return next();
   }
@@ -9,13 +18,13 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
   const cookieHeader = req.headers.cookie;
 
   if (!cookieHeader) {
-    return res.status(401).json({ error: 'Unauthorized' });
+    return res.status(403).json({ error: 'Forbidden' });
   }
 
   const hasAllCookies = AUTH_REQUIRED_COOKIES.every((cookieName) => cookieHeader.includes(`${cookieName}=`));
 
   if (!hasAllCookies) {
-    return res.status(401).json({ error: 'Unauthorized' });
+    return res.status(403).json({ error: 'Forbidden' });
   }
 
   try {
@@ -32,7 +41,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
         return res.status(502).json({ error: 'Auth service unavailable' });
       }
 
-      return res.status(401).json({ error: 'Unauthorized' });
+      return res.status(403).json({ error: 'Forbidden' });
     }
 
     const user = await response.json();

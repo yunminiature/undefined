@@ -7,6 +7,10 @@ import serialize from 'serialize-javascript';
 import ServerApp from './components/ServerApp';
 import { createAppStore } from '../../client/src/store';
 import { authMiddleware } from './middleware/authMiddleware';
+import { ensureDatabaseConnection, syncDatabase } from './db/sequelize';
+import topicsRouter from './web/topicsRouter';
+import commentsRouter from './web/commentsRouter';
+import reactionsRouter from './web/reactionsRouter';
 
 const app = express();
 const port = process.env.SERVER_PORT || 3000;
@@ -24,6 +28,7 @@ app.use('/assets', express.static(path.join(clientDistPath, 'assets')));
 app.use(express.static(clientDistPath, { index: false }));
 
 const apiRouter = express.Router();
+app.use(express.json({ limit: '1mb' }));
 
 apiRouter.use(authMiddleware);
 
@@ -33,10 +38,10 @@ apiRouter.get('/health', (_req, res) => {
 });
 
 // API routes placeholder
-apiRouter.use((_req, res) => {
-  // Здесь можно добавить API роуты
-  res.status(404).json({ error: 'API endpoint not found' });
-});
+apiRouter.use('/topics', topicsRouter);
+apiRouter.use('/comments', commentsRouter);
+apiRouter.use('/reactions', reactionsRouter);
+apiRouter.use((_req, res) => res.status(404).json({ error: 'API endpoint not found' }));
 
 app.use('/api', apiRouter);
 
@@ -133,9 +138,21 @@ app.use((err: Error, _req: express.Request, res: express.Response) => {
   res.status(500).send('Internal Server Error');
 });
 
-app.listen(port, () => {
-  console.log(`🚀 SSR Server запущен на порту ${port}`);
-  console.log(`📂 Статические файлы обслуживаются из: ${clientDistPath}`);
-});
+async function start() {
+  try {
+    await ensureDatabaseConnection();
+    await syncDatabase();
+  } catch (e) {
+    console.error('❌ Failed to connect to Postgres via Sequelize', e);
+  }
+
+  app.listen(port, () => {
+    console.log(`🚀 SSR Server запущен на порту ${port}`);
+    console.log(`📂 Статические файлы обслуживаются из: ${clientDistPath}`);
+    console.log(`[ENV] NODE_ENV=${process.env.NODE_ENV} SERVER_PORT=${process.env.SERVER_PORT}`);
+  });
+}
+
+start();
 
 export default app;
