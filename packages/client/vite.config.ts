@@ -9,6 +9,7 @@ dotenv.config()
 export default defineConfig({
   server: {
     port: Number(process.env.CLIENT_PORT) || 3000,
+    strictPort: true,
   },
   define: {
     __SERVER_PORT__: process.env.SERVER_PORT,

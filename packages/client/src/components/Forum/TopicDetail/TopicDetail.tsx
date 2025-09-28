@@ -1,46 +1,42 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, User, Calendar, MessageCircle } from 'lucide-react';
 
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui';
 import { CommentForm } from '@/components/Forum/CommentForm';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import {
-  loadTopicById,
-  selectCurrentTopic,
-  selectCurrentTopicComments,
-  selectForumLoading,
-  selectForumError,
-  clearCurrentTopic,
-} from '@/store/forumSlice';
-import { Comment } from '@/types';
+import { useGetTopicQuery, useGetCommentsByTopicQuery } from '@/api/forum';
 
 export const TopicDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
 
-  const topic = useAppSelector(selectCurrentTopic);
-  const comments = useAppSelector(selectCurrentTopicComments);
-  const loading = useAppSelector(selectForumLoading);
-  const error = useAppSelector(selectForumError);
+  const topicId = parseInt(id || '0', 10);
 
-  useEffect(() => {
-    if (!id) {
-      navigate('/forum');
-      return;
+  const {
+    data: topic,
+    isLoading: topicLoading,
+    error: topicError,
+  } = useGetTopicQuery(topicId, {
+    skip: !topicId,
+  });
+
+  const { data: commentsResponse, isLoading: commentsLoading } = useGetCommentsByTopicQuery(
+    {
+      topicId,
+    },
+    {
+      skip: !topicId,
     }
+  );
 
-    dispatch(loadTopicById(id))
-      .unwrap()
-      .catch(() => {
-        navigate('/forum');
-      });
+  const comments = commentsResponse?.data || [];
+  const loading = topicLoading || commentsLoading;
+  const error = topicError;
 
-    return () => {
-      dispatch(clearCurrentTopic());
-    };
-  }, [id, navigate, dispatch]);
+  if (!topicId) {
+    navigate('/forum');
+    return null;
+  }
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -65,7 +61,7 @@ export const TopicDetail: React.FC = () => {
     return (
       <div className='text-center py-12'>
         <h2 className='text-2xl font-bold mb-4'>Error</h2>
-        <p className='text-red-500 mb-4'>{error}</p>
+        <p className='text-red-500 mb-4'>{'status' in error ? `Error ${error.status}` : 'An error occurred'}</p>
         <Link to='/forum'>
           <Button>
             <ArrowLeft className='h-4 w-4 mr-2' />
@@ -109,7 +105,7 @@ export const TopicDetail: React.FC = () => {
           <div className='flex items-center gap-4 text-sm text-muted-foreground'>
             <div className='flex items-center gap-1'>
               <User className='h-4 w-4' />
-              {topic.author}
+              {topic.author?.display_name || topic.author?.login || 'Unknown'}
             </div>
             <div className='flex items-center gap-1'>
               <Calendar className='h-4 w-4' />
@@ -123,7 +119,7 @@ export const TopicDetail: React.FC = () => {
         </CardHeader>
         <CardContent>
           <div className='prose max-w-none'>
-            <p className='whitespace-pre-wrap'>{topic.content}</p>
+            <p className='whitespace-pre-wrap'>{topic.body}</p>
           </div>
         </CardContent>
       </Card>
@@ -147,7 +143,9 @@ export const TopicDetail: React.FC = () => {
                   <div className='flex items-center gap-4 text-sm text-muted-foreground'>
                     <div className='flex items-center gap-1'>
                       <User className='h-4 w-4' />
-                      <span className='font-medium'>{comment.author}</span>
+                      <span className='font-medium'>
+                        {comment.author?.display_name || comment.author?.login || 'Unknown'}
+                      </span>
                     </div>
                     <div className='flex items-center gap-1'>
                       <Calendar className='h-4 w-4' />
@@ -156,7 +154,7 @@ export const TopicDetail: React.FC = () => {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className='whitespace-pre-wrap'>{comment.content}</p>
+                  <p className='whitespace-pre-wrap'>{comment.body}</p>
                 </CardContent>
               </Card>
             ))}
@@ -165,7 +163,7 @@ export const TopicDetail: React.FC = () => {
       </div>
 
       {/* Comment Form */}
-      <CommentForm topicId={topic.id} />
+      <CommentForm topicId={topicId} />
     </div>
   );
 };
