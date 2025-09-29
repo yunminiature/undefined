@@ -101,7 +101,7 @@ export default function MainLayout() {
               size='icon'
               aria-label='Toggle theme'
               onClick={toggleTheme}
-              title={theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme'}
+              title={`Switch to ${themeTitle} theme`}
             >
               {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
             </Button>
