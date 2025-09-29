@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from 'express';
 import path from 'path';
 import fs from 'fs';
@@ -11,6 +12,7 @@ import { ensureDatabaseConnection, syncDatabase } from './db/sequelize';
 import topicsRouter from './web/topicsRouter';
 import commentsRouter from './web/commentsRouter';
 import reactionsRouter from './web/reactionsRouter';
+import themeRouter from './web/themeRouter';
 
 const app = express();
 const port = process.env.SERVER_PORT || 3000;
@@ -29,6 +31,7 @@ app.use(express.static(clientDistPath, { index: false }));
 
 const apiRouter = express.Router();
 app.use(express.json({ limit: '1mb' }));
+app.use('/api', themeRouter);
 
 apiRouter.use(authMiddleware);
 
@@ -133,9 +136,9 @@ const renderReactApp = (req: express.Request, res: express.Response) => {
 app.get('*', renderReactApp);
 
 // Error handling middleware
-app.use((err: Error, _req: express.Request, res: express.Response) => {
+app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error('Server Error:', err);
-  res.status(500).send('Internal Server Error');
+  res.status(500).json({ error: 'Internal Server Error' });
 });
 
 async function start() {

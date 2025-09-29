@@ -14,8 +14,11 @@ declare module 'sequelize' {
     static belongsToMany(target: any, options?: any): any
     // Minimal static query APIs used in the codebase
     static findAll(this: any, options?: any): Promise<any[]>
+    static findOne(this: any, options?: any): Promise<any | null>
     static findByPk(this: any, identifier: any, options?: any): Promise<any | null>
+    static count(this: any, options?: any): Promise<number>
     static create(this: any, values?: any, options?: any): Promise<any>
+    static bulkCreate(this: any, records: any[], options?: any): Promise<any[]>
     static findOrCreate(this: any, options?: any): Promise<[any, boolean]>
     static destroy(this: any, options?: any): Promise<number>
 

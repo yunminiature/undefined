@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useGetUserInfoQuery, useLogoutMutation } from '@/api/auth';
 import { setUser, clearUser, selectIsAuthenticated, selectUser } from '@/store/authSlice';
 import { toast } from 'sonner';
-import { AuthContext } from './AuthContext';
+import { AuthContext } from '@/providers';
 import { useOAuth } from '@/hooks/useOAuth';
 
 export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
