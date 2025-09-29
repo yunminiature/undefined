@@ -7,6 +7,21 @@ import { clearUser } from '@/store/authSlice';
 const baseQuery = fetchBaseQuery({
   baseUrl: BASE_API_URL,
   credentials: 'include',
+  prepareHeaders: (headers, { endpoint }) => {
+    // Для авторизационных запросов принудительно отключаем кэш
+    if (endpoint && endpoint.includes('auth')) {
+      headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+      headers.set('Pragma', 'no-cache');
+      headers.set('Expires', '0');
+    }
+    return headers;
+  },
+});
+
+// Специальный baseQuery для локального API
+export const localApiBaseQuery = fetchBaseQuery({
+  baseUrl: 'http://localhost:3001/api', // Локальный сервер (SERVER_PORT=3001)
+  credentials: 'include', // Автоматически передает куки
 });
 
 export const baseQueryWithAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (

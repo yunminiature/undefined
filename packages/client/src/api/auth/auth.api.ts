@@ -30,7 +30,14 @@ export const authApi = createApi({
       query: () => ({
         url: '/auth/user',
         method: 'GET',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          Pragma: 'no-cache',
+          Expires: '0',
+        },
       }),
+      // Отключаем кэширование RTK Query для этого запроса
+      keepUnusedDataFor: 0,
     }),
   }),
 });

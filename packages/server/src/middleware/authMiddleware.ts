@@ -21,9 +21,10 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     return res.status(403).json({ error: 'Forbidden' });
   }
 
-  const hasAllCookies = AUTH_REQUIRED_COOKIES.every((cookieName) => cookieHeader.includes(`${cookieName}=`));
+  // Проверяем наличие хотя бы одной из требуемых кук (более гибкий подход)
+  const hasAnyCookie = AUTH_REQUIRED_COOKIES.some((cookieName) => cookieHeader.includes(`${cookieName}=`));
 
-  if (!hasAllCookies) {
+  if (!hasAnyCookie) {
     return res.status(403).json({ error: 'Forbidden' });
   }
 

@@ -75,6 +75,7 @@ function ProfileDropdown() {
 
 export default function MainLayout() {
   const { theme, toggleTheme } = useTheme();
+  const themeTitle = theme === 'light' ? 'dark' : 'light';
   return (
     <div className='flex min-h-screen flex-col'>
       <header className='border-b px-6 py-3'>
