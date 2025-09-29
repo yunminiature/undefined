@@ -9,6 +9,7 @@ dotenv.config()
 export default defineConfig({
   server: {
     port: Number(process.env.CLIENT_PORT) || 3000,
+    strictPort: true,
     proxy: {
       '/api': {
         target: `http://localhost:${process.env.SERVER_PORT || 3001}`,
