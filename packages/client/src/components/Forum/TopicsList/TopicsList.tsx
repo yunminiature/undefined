@@ -1,20 +1,13 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { MessageCircle, Plus, User, Calendar } from 'lucide-react';
 
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { loadTopics, selectTopics, selectForumLoading, selectForumError } from '@/store/forumSlice';
+import { useGetTopicsQuery } from '@/api/forum';
 
 export const TopicsList: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const topics = useAppSelector(selectTopics);
-  const loading = useAppSelector(selectForumLoading);
-  const error = useAppSelector(selectForumError);
-
-  useEffect(() => {
-    dispatch(loadTopics());
-  }, [dispatch]);
+  const { data: topicsResponse, isLoading: loading, error } = useGetTopicsQuery({});
+  const topics = topicsResponse?.data || [];
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -38,7 +31,7 @@ export const TopicsList: React.FC = () => {
   if (error) {
     return (
       <div className='flex justify-center items-center min-h-[200px]'>
-        <div className='text-red-500'>Error: {error}</div>
+        <div className='text-red-500'>Error: {JSON.stringify(error)}</div>
       </div>
     );
   }
@@ -90,7 +83,7 @@ export const TopicsList: React.FC = () => {
                     <div className='flex items-center gap-4 mt-2 text-sm text-muted-foreground'>
                       <div className='flex items-center gap-1'>
                         <User className='h-4 w-4' />
-                        {topic.author}
+                        {topic.author?.display_name || topic.author?.login || 'Unknown'}
                       </div>
 
                       <div className='flex items-center gap-1'>
@@ -100,7 +93,7 @@ export const TopicsList: React.FC = () => {
 
                       <div className='flex items-center gap-1'>
                         <MessageCircle className='h-4 w-4' />
-                        {topic.commentsCount}
+                        {topic.commentsCount || 0}
                       </div>
                     </div>
                   </div>
@@ -108,7 +101,7 @@ export const TopicsList: React.FC = () => {
               </CardHeader>
 
               <CardContent>
-                <CardDescription className='line-clamp-3'>{topic.content}</CardDescription>
+                <CardDescription className='line-clamp-3'>{topic.body}</CardDescription>
 
                 <div className='mt-4'>
                   <Link to={`/forum/topic/${topic.id}`}>

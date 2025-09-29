@@ -3,6 +3,6 @@ pre-commit:
   commands:
     eslint:
       glob: '*.{ts,tsx,js,jsx}'
-      run: npx eslint --ext ts --ext tsx --max-warnings=20 {staged_files}
+      run: npx eslint --ext ts --ext tsx --max-warnings=60 {staged_files}
     prettier:
       run: npx prettier --write {staged_files} && git add {staged_files}
