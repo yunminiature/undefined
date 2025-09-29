@@ -5,6 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { createAppStore } from './store';
 import App from './App';
 import './index.css';
+import { ThemeProvider } from '@/providers';
 
 // Типизация для предзагруженного состояния
 declare global {
@@ -31,7 +32,9 @@ const store = createAppStore(preloadedState);
 const createApp = () => (
   <Provider store={store}>
     <BrowserRouter>
-      <App />
+      <ThemeProvider>
+        <App />
+      </ThemeProvider>
     </BrowserRouter>
   </Provider>
 );

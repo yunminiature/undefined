@@ -2,28 +2,32 @@ import { Sequelize } from 'sequelize';
 
 const { POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB, POSTGRES_HOST, POSTGRES_PORT } = process.env;
 
-export const sequelize = new Sequelize(
-  POSTGRES_DB || 'postgres',
-  POSTGRES_USER || 'postgres',
-  POSTGRES_PASSWORD || 'postgres',
-  {
-    host: POSTGRES_HOST || 'localhost',
-    port: Number(POSTGRES_PORT) || 5432,
-    dialect: 'postgres',
-    logging: false,
-    define: {
-      underscored: true,
-      timestamps: true,
-    },
-  }
-);
+const rawHost = POSTGRES_HOST || 'localhost';
+const isDockerHost = rawHost === 'prakticum-postgres';
+const resolvedHost = process.env.NODE_ENV !== 'production' && isDockerHost ? 'localhost' : rawHost;
+const resolvedDb = POSTGRES_DB || 'postgres';
+const resolvedUser = POSTGRES_USER || 'postgres';
+const resolvedPassword = POSTGRES_PASSWORD || 'postgres';
+const resolvedPort = Number(POSTGRES_PORT) || 5432;
+
+export const sequelize = new Sequelize(resolvedDb, resolvedUser, resolvedPassword, {
+  host: resolvedHost,
+  port: resolvedPort,
+  dialect: 'postgres',
+  logging: false,
+  define: {
+    underscored: true,
+    timestamps: true,
+  },
+});
 
 export async function ensureDatabaseConnection(): Promise<void> {
   console.log('[DB] Connecting to Postgres with', {
-    host: process.env.POSTGRES_HOST,
-    port: process.env.POSTGRES_PORT,
-    db: process.env.POSTGRES_DB,
-    user: process.env.POSTGRES_USER,
+    host: resolvedHost,
+    port: resolvedPort,
+    db: resolvedDb,
+    user: resolvedUser,
+    nodeEnv: process.env.NODE_ENV,
   });
   await sequelize.authenticate();
   console.log('[DB] Connection successful');
