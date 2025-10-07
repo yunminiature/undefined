@@ -9,6 +9,7 @@ import type { Request } from 'express';
 import ReactDOMServer from 'react-dom/server';
 import { Provider } from 'react-redux';
 import serialize from 'serialize-javascript';
+import crypto from 'crypto';
 import ServerApp from './components/ServerApp';
 import { createAppStore } from '../../client/src/store';
 import { authMiddleware } from './middleware/authMiddleware';
@@ -26,6 +27,29 @@ const clientDistPath =
   process.env.NODE_ENV === 'production'
     ? path.join('/client/dist') // In Docker container
     : path.join(__dirname, '../../client/dist'); // Locally
+
+// CSP и Security Headers middleware (должен быть ПЕРВЫМ)
+app.use((req, res, next) => {
+  console.log(`[CSP] Установка заголовков для: ${req.url}`);
+
+  // Генерируем nonce для этого запроса
+  const nonce = generateNonce();
+
+  // Добавляем nonce в res.locals для использования в HTML template
+  res.locals.nonce = nonce;
+
+  // Устанавливаем CSP заголовок
+  const cspPolicy = getCSPPolicy(nonce);
+  res.setHeader('Content-Security-Policy', cspPolicy);
+
+  // Дополнительные заголовки безопасности
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+
+  next();
+});
 
 // Serve static files from client build
 app.use('/static', express.static(clientDistPath));
@@ -68,7 +92,7 @@ app.use(
 app.use(cookieParser());
 
 // Проксирование на внешний API Яндекс.Практикума
-const proxyOptions: unknown = {
+const proxyOptions = {
   target: 'https://ya-praktikum.tech/api/v2', // Включаем /api/v2 в target
   changeOrigin: true,
   secure: true, // Проверяем SSL сертификаты
@@ -232,14 +256,86 @@ try {
   console.warn('⚠️  Could not read Vite manifest. Falling back to default asset names.', e);
 }
 
+// Генерация nonce для inline скриптов
+const generateNonce = () => {
+  return crypto.randomBytes(16).toString('base64');
+};
+
+// CSP Policy для безопасности
+const getCSPPolicy = (nonce?: string) => {
+  const isDevelopment = process.env.NODE_ENV !== 'production';
+
+  // Базовые директивы
+  const directives = [
+    // Скрипты - разрешаем только наш домен и inline скрипты с nonce
+    nonce
+      ? `script-src 'self' 'nonce-${nonce}' 'unsafe-eval'` // Используем nonce для inline скриптов
+      : "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // Fallback для совместимости
+
+    // Стили - разрешаем наш домен и inline стили
+    "style-src 'self' 'unsafe-inline'",
+
+    // Изображения - разрешаем наш домен и внешние источники
+    "img-src 'self' data: https://github.com https://ya-praktikum.tech",
+
+    // Шрифты - разрешаем наш домен и data: для встроенных шрифтов
+    "font-src 'self' data:",
+
+    // Подключения - разрешаем API запросы к нашим серверам и внешним API
+    "connect-src 'self' http://localhost:* https://ya-praktikum.tech https://oauth.yandex.ru",
+
+    // Фреймы - запрещаем встраивание в iframe
+    "frame-ancestors 'none'",
+
+    // Базовый URI - только наш домен
+    "base-uri 'self'",
+
+    // Формы - разрешаем отправку только на наш домен и внешние API
+    "form-action 'self' https://oauth.yandex.ru",
+
+    // Объекты - запрещаем встраивание плагинов
+    "object-src 'none'",
+
+    // Медиа - разрешаем наш домен
+    "media-src 'self'",
+
+    // Манифест - разрешаем наш домен
+    "manifest-src 'self'",
+
+    // Worker - разрешаем наш домен
+    "worker-src 'self'",
+
+    // Upgrade insecure requests - принудительно использовать HTTPS
+    'upgrade-insecure-requests',
+  ];
+
+  // В development режиме добавляем более мягкие правила
+  if (isDevelopment) {
+    // Разрешаем localhost с любыми портами для разработки
+    const devDirectives = directives.map((dir) => {
+      if (dir.startsWith('connect-src')) {
+        return dir.replace("'self'", "'self' http://localhost:* ws://localhost:* wss://localhost:*");
+      }
+      if (dir.startsWith('script-src')) {
+        return dir.replace("'unsafe-eval'", "'unsafe-eval'"); // Vite требует unsafe-eval в dev
+      }
+      return dir;
+    });
+    return devDirectives.join('; ');
+  }
+
+  return directives.join('; ');
+};
+
 // HTML template function
-const createHTMLTemplate = (reactHtml: string, preloadedState: Record<string, unknown> = {}) => `
+const createHTMLTemplate = (reactHtml: string, preloadedState: Record<string, unknown> = {}, nonce?: string) => `
 <!DOCTYPE html>
 <html lang="ru">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>React SSR Application</title>
+    <meta http-equiv="Content-Security-Policy" content="${getCSPPolicy(nonce)}">
     ${clientCss ? `<link rel="stylesheet" href="${clientCss}">` : ''}
     <style>
       /* Критические стили для предотвращения FOUC */
@@ -258,7 +354,7 @@ const createHTMLTemplate = (reactHtml: string, preloadedState: Record<string, un
   </head>
   <body>
     <div id="root">${reactHtml}</div>
-    <script>
+    <script${nonce ? ` nonce="${nonce}"` : ''}>
       // Передача состояния Redux на клиент
       window.__PRELOADED_STATE__ = ${serialize(preloadedState, { isJSON: true })};
     </script>
@@ -271,6 +367,9 @@ const createHTMLTemplate = (reactHtml: string, preloadedState: Record<string, un
 const renderReactApp = (req: express.Request, res: express.Response) => {
   try {
     console.log(`🔍 SSR рендер для маршрута: ${req.url}`);
+
+    // Используем nonce из res.locals (установлен в middleware)
+    const nonce = res.locals.nonce;
 
     // Создаем стор на сервере в SSR режиме (без RTK Query middleware)
     const store = createAppStore(undefined, true);
@@ -285,7 +384,7 @@ const renderReactApp = (req: express.Request, res: express.Response) => {
     const appString = ReactDOMServer.renderToString(reactApp);
     const preloadedState = store.getState() as unknown as Record<string, unknown>;
 
-    const html = createHTMLTemplate(appString, preloadedState);
+    const html = createHTMLTemplate(appString, preloadedState, nonce);
 
     res.status(200).send(html);
   } catch (error) {
@@ -293,9 +392,11 @@ const renderReactApp = (req: express.Request, res: express.Response) => {
 
     // В случае ошибки SSR - fallback на CSR
     console.log('🔄 Falling back to client-side rendering');
+    const nonce = res.locals.nonce || generateNonce();
     const fallbackHtml = createHTMLTemplate(
       '<div id="root"><div style="text-align: center; padding: 50px;"><h1>Загрузка приложения...</h1><p>Пожалуйста, подождите</p></div></div>',
-      {}
+      {},
+      nonce
     );
 
     res.status(200).send(fallbackHtml);
