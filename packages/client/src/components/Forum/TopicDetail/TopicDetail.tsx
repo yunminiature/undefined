@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, User, Calendar, MessageCircle } from 'lucide-react';
+import { requestNotificationPermission, notify } from '@/lib/notifications';
+import { toast } from 'sonner';
 
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui';
 import { CommentForm } from '@/components/Forum/CommentForm';
@@ -20,7 +22,11 @@ export const TopicDetail: React.FC = () => {
     skip: !topicId,
   });
 
-  const { data: commentsResponse, isLoading: commentsLoading } = useGetCommentsByTopicQuery(
+  const {
+    data: commentsResponse,
+    isLoading: commentsLoading,
+    refetch: refetchComments,
+  } = useGetCommentsByTopicQuery(
     {
       topicId,
     },
@@ -30,8 +36,42 @@ export const TopicDetail: React.FC = () => {
   );
 
   const comments = commentsResponse?.data || [];
+  const totalComments = commentsResponse?.total ?? comments.length;
   const loading = topicLoading || commentsLoading;
   const error = topicError;
+
+  // Ask for notification permission on mount of topic detail
+  useEffect(() => {
+    requestNotificationPermission();
+  }, []);
+
+  // Poll comments and notify on new ones based on TOTAL count (not page length)
+  const previousCountRef = useRef<number>(totalComments);
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      const prev = previousCountRef.current;
+      const res = await refetchComments();
+      const nextCount = (res.data?.total as number | undefined) ?? prev;
+      if (nextCount > prev) {
+        if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+          notify('Новый комментарий', 'В теме появился новый ответ', {
+            tag: `topic-${topicId}`,
+          });
+        } else {
+          toast.info('Новый комментарий', { description: 'В теме появился новый ответ' });
+        }
+      }
+      previousCountRef.current = nextCount;
+    }, 15000);
+    return () => clearInterval(interval);
+  }, [refetchComments]);
+
+  // Update count reference when total changes, but don't notify here
+  useEffect(() => {
+    const nextCount = totalComments;
+
+    previousCountRef.current = nextCount;
+  }, [totalComments]);
 
   if (!topicId) {
     navigate('/forum');
@@ -111,10 +151,6 @@ export const TopicDetail: React.FC = () => {
               <Calendar className='h-4 w-4' />
               {formatDate(topic.createdAt)}
             </div>
-            <div className='flex items-center gap-1'>
-              <MessageCircle className='h-4 w-4' />
-              {comments.length}
-            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -126,7 +162,7 @@ export const TopicDetail: React.FC = () => {
 
       {/* Comments */}
       <div className='space-y-4'>
-        <h3 className='text-xl font-semibold'>Comments ({comments.length})</h3>
+        <h3 className='text-xl font-semibold'>Comments ({totalComments})</h3>
 
         {comments.length === 0 ? (
           <Card>
