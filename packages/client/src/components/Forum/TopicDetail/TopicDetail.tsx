@@ -54,11 +54,11 @@ export const TopicDetail: React.FC = () => {
       const nextCount = (res.data?.total as number | undefined) ?? prev;
       if (nextCount > prev) {
         if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-          notify('Новый комментарий', 'В теме появился новый ответ', {
+          notify('New Comment', 'A new reply has appeared in the topic', {
             tag: `topic-${topicId}`,
           });
         } else {
-          toast.info('Новый комментарий', { description: 'В теме появился новый ответ' });
+          toast.info('New Comment', { description: 'A new reply has appeared in the topic' });
         }
       }
       previousCountRef.current = nextCount;
