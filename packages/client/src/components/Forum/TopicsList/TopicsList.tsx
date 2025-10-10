@@ -90,11 +90,6 @@ export const TopicsList: React.FC = () => {
                         <Calendar className='h-4 w-4' />
                         {formatDate(topic.createdAt)}
                       </div>
-
-                      <div className='flex items-center gap-1'>
-                        <MessageCircle className='h-4 w-4' />
-                        {topic.commentsCount || 0}
-                      </div>
                     </div>
                   </div>
                 </div>

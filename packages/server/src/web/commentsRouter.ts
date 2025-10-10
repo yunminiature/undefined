@@ -14,8 +14,13 @@ router.get('/by-topic/:topicId', async (req, res) => {
   const limit = Math.min(Number(req.query.limit) || 20, 100);
   const offset = Number(req.query.offset) || 0;
   const topicId = Number(req.params.topicId);
+
+  // Count total root-level comments for the topic
+  const total = await Comment.count({ where: { topicId, parentCommentId: null } as unknown });
+
+  // Fetch page
   const comments = await Comment.findAll({
-    where: { topicId, parent_comment_id: null },
+    where: { topicId, parentCommentId: null } as unknown,
     limit,
     offset,
     order: [['createdAt', 'DESC']],
@@ -61,8 +66,8 @@ router.get('/by-topic/:topicId', async (req, res) => {
   // Возвращаем в формате CommentListResponse
   const response = {
     data: enrichedComments,
-    total: enrichedComments.length,
-    hasMore: enrichedComments.length === limit,
+    total,
+    hasMore: offset + enrichedComments.length < total,
   };
 
   return res.json(response);

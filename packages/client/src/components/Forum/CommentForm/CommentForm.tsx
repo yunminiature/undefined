@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 
 import { Button, Label, Textarea, Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
 import { useCreateCommentMutation } from '@/api/forum';
+// Notifications are handled on receiving new comments, not on submit
 
 const commentSchema = z.object({
   body: z
