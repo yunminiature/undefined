@@ -3,6 +3,8 @@
 *.json
 *.md
 *.mdx
+*.conf
+*.nginx
 
 *.ttf
 *.gz
