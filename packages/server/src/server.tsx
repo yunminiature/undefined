@@ -69,6 +69,11 @@ app.use(
         return callback(null, true);
       }
 
+      // Разрешаем наш домен
+      if (origin === 'https://undefined.ya-praktikum.tech') {
+        return callback(null, true);
+      }
+
       // В продакшене можно добавить конкретные домены
       callback(new Error('Not allowed by CORS'));
     },
@@ -282,7 +287,7 @@ const getCSPPolicy = (nonce?: string) => {
     "font-src 'self' data:",
 
     // Подключения - разрешаем API запросы к нашим серверам и внешним API
-    "connect-src 'self' http://localhost:* https://ya-praktikum.tech https://oauth.yandex.ru",
+    "connect-src 'self' http://localhost:* https://undefined.ya-praktikum.tech https://ya-praktikum.tech https://oauth.yandex.ru",
 
     // Фреймы - запрещаем встраивание в iframe
     "frame-ancestors 'none'",
