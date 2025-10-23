@@ -19,8 +19,9 @@ const baseQuery = fetchBaseQuery({
 });
 
 // Специальный baseQuery для локального API
+// Используем относительный путь для работы через Vite proxy (dev) и nginx proxy (prod)
 export const localApiBaseQuery = fetchBaseQuery({
-  baseUrl: 'http://localhost:3001/api', // Локальный сервер (SERVER_PORT=3001)
+  baseUrl: '/api', // Относительный путь - проксируется на сервер
   credentials: 'include', // Автоматически передает куки
 });
 
