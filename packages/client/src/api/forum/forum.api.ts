@@ -16,8 +16,9 @@ import type {
 import { fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 // Forum API использует локальный сервер
+// Используем относительный путь для работы через Vite proxy (dev) и nginx proxy (prod)
 const forumBaseQuery = fetchBaseQuery({
-  baseUrl: 'http://localhost:3001/api', // Локальные API маршруты на сервере
+  baseUrl: '/api', // Относительный путь - проксируется на сервер
   credentials: 'include',
   prepareHeaders: (headers) => {
     headers.set('Cache-Control', 'no-cache');
